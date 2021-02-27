@@ -1,0 +1,16 @@
+FileVersion = 1
+Dependencies = {corlib = "*", Pile = "*", Pile_SDL2 = "*", Pile_SoLoud = "*", FastNoiseLite = "*", Pile_OpenGL = "*", Dimtoo = "*"}
+
+[Project]
+Name = "NecroCard"
+StartupObject = "Pile.EntryPoint"
+Aliases = ["PileGame"]
+
+[Configs.Debug.Win32]
+PostBuildCmds = ["Execute(\"$(BuildDir)/$(ProjectName).exe -packager\")"]
+
+[Configs.Release.Win64]
+PostBuildCmds = ["Execute(\"$(BuildDir)/$(ProjectName).exe -packager\")"]
+
+[Configs.Release.Win32]
+PostBuildCmds = ["Execute(\"$(BuildDir)/$(ProjectName).exe -packager\")"]
