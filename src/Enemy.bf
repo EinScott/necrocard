@@ -27,12 +27,16 @@ namespace NecroCard
 
 			ActuallyMakeMove();
 
-			waitCounter = (float)rand.Next(0, 11) / 10;
+			waitCounter = (float)rand.Next(5, 21) / 10;
 		}
 
 		[Inline]
 		void ActuallyMakeMove()
 		{
+			// all these actions have chances so that this thing does dumb stuff!
+
+			// if my board is empty try to play card that is equal to the card played by the player
+
 			if (Stats.hand.Count > 0)
 			{
 				Stats.PlayCard(0);

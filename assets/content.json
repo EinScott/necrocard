@@ -3,6 +3,10 @@
   	{
   	  "path": "Sprites/*",
   	  "importer": "ase"
-  	}
+  	},
+    {
+      "path": "Audio/*",
+      "importer": "audio_clip"
+    }
   ]
 }

@@ -4,35 +4,34 @@ using Pile;
 
 namespace NecroCard
 {
-	public class Stats
+	struct CardInstance
 	{
-		// @do this should just be one base class and enemy and player inheritors!
-		// generally, move these classes out of this file
+		public readonly Card Card;
 
-		public struct HandCard
+		public Point2 Position { get; private set mut; }
+		Vector2 easePos;
+		public Vector2 EasePos
 		{
-			public readonly Card Card;
-
-			public Point2 Position { get; private set mut; }
-			Vector2 easePos;
-			public Vector2 EasePos
+			[Inline]
+			get => easePos;
+			set mut
 			{
-				[Inline]
-				get => easePos;
-				set mut
-				{
-					easePos = value;
-					Position = value.Round();
-				}
-			}
-
-			public this(Card card)
-			{
-				Card = card;
-				easePos = .(0, 64); // Below screen
-				Position = easePos.Round();
+				easePos = value;
+				Position = value.Round();
 			}
 		}
+
+		public this(Card card)
+		{
+			Card = card;
+			easePos = .(0, 64); // Below screen
+			Position = easePos.Round();
+		}
+	}
+
+	public class Stats
+	{
+		// not the nicest code, is all over the place, but works
 
 		const int MaxHandCards = 4;
 		const int PlayOffset = -6;
@@ -43,7 +42,7 @@ namespace NecroCard
 		readonly CardLayout Layout;
 		readonly bool IsPlayer;
 
-		public List<HandCard> hand = new List<HandCard>(MaxHandCards) ~ delete _;
+		public List<CardInstance> hand = new List<CardInstance>(MaxHandCards) ~ delete _;
 		int drawStartXOffset = 0;
 		int selected = -1;
 		bool firstTurn = true;
@@ -68,7 +67,7 @@ namespace NecroCard
 				if (i == selected)
 				{
 					hand[[Unchecked]i].EasePos = .(
-						0, // @do easing when playing/ drawing cards
+						0, // @cut easing when playing/ drawing cards
 						Math.Lerp(hand[[Unchecked]i].EasePos.Y, PlayOffset, Time.Delta * 10)
 					);
 				}
@@ -132,7 +131,7 @@ namespace NecroCard
 			for (int i < hand.Count)
 			{
 				let handCard = hand[[Unchecked]i];
-				handCard.Card.Draw(batch, Top + .(xOffset, handCard.Position.Y)); // @do later easing to xOffset should be in update, this should just be .Position
+				handCard.Card.Draw(batch, Top + .(xOffset, handCard.Position.Y)); // @cut later easing to xOffset should be in update, this should just be .Position
 
 				if (DebugRender)
 					batch.HollowRect(.(Top + .(xOffset, handCard.Position.Y), Card.Size), 1, .Red);
@@ -181,7 +180,6 @@ namespace NecroCard
 		{
 			if (Layout.IsFull())
 			{
-				// @do color ease as indicator
 				return;
 			}
 

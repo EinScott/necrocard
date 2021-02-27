@@ -23,26 +23,38 @@ namespace NecroCard
 		public static bool DebugRender => NecroCard.Instance.debugRender;
 		[Inline]
 		public static Point2 PixelMouse => NecroCard.Instance.pixelMousePos;
+		public static NecroCard.GameState GameState
+		{
+			[Inline]
+			get => NecroCard.Instance.gameState;
+			set => NecroCard.Instance.gameState = value;
+		}
 	}
 
 	static class Draw
 	{
 		public static Asset<Sprite> cards;
 		public static Asset<Sprite> background;
-		public static Asset<Sprite> button;
+		public static Asset<Sprite> drawButton;
 		public static Asset<Sprite> turn;
 		public static Asset<Sprite> smallNumbers;
 		public static Asset<Sprite> bigNumbers;
+		public static Asset<Sprite> restartButton;
+		public static Asset<Sprite> menuButton;
+		public static Asset<Sprite> endscreen;
 		public static SpriteFont font;
 
 		internal static void Create()
 		{
 			cards = new Asset<Sprite>("cards");
 			background = new Asset<Sprite>("background");
-			button = new Asset<Sprite>("button");
+			drawButton = new Asset<Sprite>("button_draw");
 			turn = new Asset<Sprite>("turn");
-			smallNumbers = new Asset<Sprite>("smallnumbers");
-			bigNumbers = new Asset<Sprite>("bignumbers");
+			smallNumbers = new Asset<Sprite>("small_numbers");
+			bigNumbers = new Asset<Sprite>("big_numbers");
+			menuButton = new Asset<Sprite>("button_menu");
+			restartButton = new Asset<Sprite>("button_restart");
+			endscreen = new Asset<Sprite>("endscreen");
 
 			// just reference
 			font = NecroCard.Instance.font;
@@ -52,10 +64,13 @@ namespace NecroCard
 		{
 			delete cards;
 			delete background;
-			delete button;
+			delete drawButton;
 			delete turn;
 			delete smallNumbers;
 			delete bigNumbers;
+			delete menuButton;
+			delete restartButton;
+			delete endscreen;
 		}
 	}
 
@@ -67,12 +82,21 @@ namespace NecroCard
 		public Batch2D batch ~ delete _;
 		public bool debugRender;
 
-		//AudioClip clip ~ delete _;
-		//GlobalSource music ~ delete _;
+		AudioClip theme;
+		GlobalSource music ~ delete _;
 
 		public SpriteFont font ~ delete _;
 		public Board board ~ delete _;
 		public Point2 pixelMousePos;
+
+		public enum GameState
+		{
+			Playing,
+			GameEnd,
+			Menu // includes tutorial, credits, options & play & exit
+		}
+
+		public GameState gameState = .Playing; // @do change when menu is done, also check for this in update and render
 
 		public this() : base(.(320, 200))
 		{
@@ -115,6 +139,11 @@ namespace NecroCard
 
 				Core.Assets.UnloadPackage("fonts");
 			}
+
+			// Music
+			theme = Core.Assets.Get<AudioClip>("theme");
+			music = new GlobalSource(null, true);
+			music.Play(theme);
 
 			// LOAD CONTENT PACKAGE
 			Core.Assets.LoadPackage("content");
@@ -175,6 +204,19 @@ namespace NecroCard
 				Performance.Render(batch, font);
 
 			batch.Render(Core.Window, .Black);
+		}
+
+		public void RestartBoard()
+		{
+			// Works for now
+			delete board;
+			board = new Board();
+			gameState = .Playing;
+		}
+
+		public void LoadMenu()
+		{
+			Log.Debug("MENU");
 		}
 
 		public Point2 Center => FrameSize / 2;
