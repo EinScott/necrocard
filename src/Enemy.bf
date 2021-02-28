@@ -5,7 +5,7 @@ namespace NecroCard
 {
 	class Enemy
 	{
-		const float AttackWait = 0.3f;
+		const float AttackWait = 0.1f;
 
 		readonly Stats Stats;
 		readonly CardLayout Layout;
@@ -17,11 +17,14 @@ namespace NecroCard
 		Vector2 attackCurr;
 		float waitCounter = 0.8f;
 		bool attacking;
+		public bool hard;
 
-		public this(Stats stats, CardLayout layout)
+		public this(Stats stats, CardLayout layout, bool first)
 		{
 			Stats = stats;
 			Layout = layout;
+			hard = !first && rand.Next(0, 3) == 0;
+			Log.Debug(hard);
 		}
 
 		public void MakeMove()
@@ -50,7 +53,7 @@ namespace NecroCard
 				{
 					// On end, actually call the attack and reset
 					Layout.EnemyEndDrag();
-					Layout.Attack(attackingCard, attackedCard); // This will finally end the turn
+					Layout.Attack(attackingCard, attackedCard, Layout.dragPosition + Card.Size / 2); // This will finally end the turn
 
 					attackWaitCounter = 0;
 					attacking = false;
@@ -64,13 +67,59 @@ namespace NecroCard
 		[Inline]
 		void ActuallyMakeMove()
 		{
+			bool canAttack = true;
+			CANATTACK:do
+			{
+				let otherLayout = Stats.[Friend]Board.playerLayout;
+				if (Layout.count == 0 || otherLayout.count == 0)
+				{
+					canAttack = false;
+					break;
+				}
+
+				Card onlyCard = null;
+				for (int i < Layout.cards.Count)
+				{
+					let myCard = ref Layout.cards[i];
+
+					if (myCard.Card == null)
+						continue;
+
+					if (onlyCard == null)
+						onlyCard = myCard.Card;
+					else if (myCard.Card != onlyCard)
+						break CANATTACK;
+				}
+
+				for (int j < otherLayout.cards.Count)
+				{
+					let otherCard = ref otherLayout.cards[j];
+
+					if (otherCard.Card == null)
+						continue;
+
+					if (otherCard.Card != onlyCard)
+						break CANATTACK;
+				}
+
+				canAttack = false;
+			}
+			
 			// all these actions have chances so that this thing does dumb stuff!
 
-			if (Layout.count > Stats.[Friend]Board.playerLayout.count && rand.Next(0, 4) < 2)
+			// if the board is even and i have less than normal health and can play the next turn, attack
+			if (hard && canAttack && (Layout.count >= 2 || Layout.count == 1 && Stats.health > 6) && Layout.count == Stats.[Friend]Board.playerLayout.count && Stats.hand.Count >= 1 && rand.Next(0, 6) < 2)
+				Attack();
+
+			else if (hard && Stats.health > Stats.[Friend]Board.playerStats.health && Layout.count > 0 && Stats.hand.Count > 0 &&  rand.Next(0, 5) < 2)
+				Attack();
+
+			// if i have more cards than the player, attack
+			else if (hard && canAttack && Layout.count > Stats.[Friend]Board.playerLayout.count && rand.Next(0, 4) < 2)
 				Attack();
 
 			// if my board is empty try to play card that is equal to the card played by the player
-			else if (Layout.count == 0 && Stats.hand.Count > 0 && rand.Next(0, 3) < 2)
+			else if (Layout.count <= 1 && Stats.hand.Count > 0 && rand.Next(0, 8) < 7)
 				PlayACard();
 
 			// Chance of drawing cards
@@ -78,25 +127,23 @@ namespace NecroCard
 				DrawCard();
 
 			// Chance of attacking cards
-			else if (Layout.count > 1 && rand.Next(0, 6 - Layout.count) < 2)
-			{
+			else if (canAttack && rand.Next(0, 6 - Layout.count) <= 2 && (!hard || Stats.health > 2))
 				Attack();
-			}
+
 			else if (Stats.hand.Count > 0 && rand.Next(0, 3) <= 1)
-			{
 				PlayACard();
-			}
+
 			else if (rand.Next(0, 2) == 0)
-			{
 				DrawCard();
-			}
 
 			if (attacking)
 				return;
 
 			if (!Stats.[Friend]Board.playerTurn) // If still nothing happened (maybe we cant draw or play)
 			{
-				Attack(); // Try to attack, otherwise we will be called next loop...
+				if (canAttack)
+					Attack(); // Try to attack, otherwise we will be called next loop...
+				else PlayACard();
 			}
 
 			void DrawCard()
@@ -179,7 +226,7 @@ namespace NecroCard
 				if (otherLayout.count == 0)
 					return;
 				
-				if (Stats.health < otherStats.health)
+				if (Stats.health < otherStats.health || rand.Next(0, 4) == 0)
 				{
 					// We should get some health
 					// attackingCard Has the highest energy and we can sacrifice it

@@ -19,8 +19,13 @@ namespace NecroCard
 {
 	static
 	{
+#if DEBUG
 		[Inline]
 		public static bool DebugRender => NecroCard.Instance.debugRender;
+#else
+		[Inline]
+		public static bool DebugRender => false;
+#endif
 		[Inline]
 		public static Point2 PixelMouse => NecroCard.Instance.pixelMousePos;
 		public static NecroCard.GameState GameState
@@ -42,6 +47,15 @@ namespace NecroCard
 		public static Asset<Sprite> restartButton;
 		public static Asset<Sprite> menuButton;
 		public static Asset<Sprite> endscreen;
+		public static Asset<Sprite> hardAIIndicator;
+		public static Asset<Sprite> particles;
+		public static Asset<Sprite> warning;
+		public static Asset<Sprite> menu;
+		public static Asset<Sprite> tutorialButton;
+		public static Asset<Sprite> playButton;
+		public static Asset<Sprite> quitButton;
+		public static Asset<Sprite> logo;
+		public static Asset<Sprite> backButton;
 		public static SpriteFont font;
 
 		internal static void Create()
@@ -55,6 +69,15 @@ namespace NecroCard
 			menuButton = new Asset<Sprite>("button_menu");
 			restartButton = new Asset<Sprite>("button_restart");
 			endscreen = new Asset<Sprite>("endscreen");
+			hardAIIndicator = new Asset<Sprite>("hard");
+			particles = new Asset<Sprite>("particles");
+			warning = new Asset<Sprite>("warning");
+			menu = new Asset<Sprite>("menu");
+			tutorialButton = new Asset<Sprite>("button_tutorial");
+			playButton = new Asset<Sprite>("button_play");
+			quitButton = new Asset<Sprite>("button_quit");
+			logo = new Asset<Sprite>("logo");
+			backButton = new Asset<Sprite>("button_back");
 
 			// just reference
 			font = NecroCard.Instance.font;
@@ -71,6 +94,15 @@ namespace NecroCard
 			delete menuButton;
 			delete restartButton;
 			delete endscreen;
+			delete hardAIIndicator;
+			delete particles;
+			delete warning;
+			delete menu;
+			delete tutorialButton;
+			delete playButton;
+			delete quitButton;
+			delete logo;
+			delete backButton;
 		}
 	}
 
@@ -86,7 +118,8 @@ namespace NecroCard
 		GlobalSource music ~ delete _;
 
 		public SpriteFont font ~ delete _;
-		public Board board ~ delete _;
+		public Board board ~ DeleteNotNull!(_);
+		public Menu menu ~ delete _;
 		public Point2 pixelMousePos;
 
 		public enum GameState
@@ -96,7 +129,7 @@ namespace NecroCard
 			Menu // includes tutorial, credits, options & play & exit
 		}
 
-		public GameState gameState = .Playing; // @do change when menu is done, also check for this in update and render
+		public GameState gameState = .Menu;
 
 		public this() : base(.(320, 200))
 		{
@@ -135,7 +168,7 @@ namespace NecroCard
 				Core.Assets.LoadPackage("fonts");
 
 				let fnt = Core.Assets.Get<Font>("nunito_semibold");
-				font = new SpriteFont(fnt, 50, Charsets.ASCII);
+				font = new SpriteFont(fnt, 24, Charsets.ASCII);
 
 				Core.Assets.UnloadPackage("fonts");
 			}
@@ -154,10 +187,10 @@ namespace NecroCard
 			batch = new Batch2D(material);
 
 			Core.Window.Resizable = true;
-			Core.Window.VSync = false;
+			Core.Window.SetTitle("Necro Card");
 
 			Draw.Create();
-			board = new Board();
+			menu = new Menu();
 		}
 
 		protected override void Shutdown()
@@ -170,15 +203,21 @@ namespace NecroCard
 		{
 			pixelMousePos = WindowToFrame(Core.Input.MousePosition);
 
-			board.Update();
+			if (gameState == .Menu)
+				menu.Update();
+			else board.Update();
+
+			if (Core.Input.Keyboard.Alt && Core.Input.Keyboard.Pressed(.Enter))
+			{
+				Core.Window.Fullscreen = !Core.Window.Fullscreen;
+			}	
 
 #if DEBUG
 			if (Core.Input.Keyboard.Pressed(.F1))
 				debugRender = !debugRender;
 			if (Core.Input.Keyboard.Pressed(.F3)) // Full reset
 			{
-				delete board;
-				board = new Board();
+				LoadGame();
 			}
 #endif
 		}
@@ -189,7 +228,9 @@ namespace NecroCard
 			Core.Graphics.Clear(Frame, .Color | .Depth | .Stencil, .Black, 0, 0, Rect(0, 0, Core.Window.RenderSize.X, Core.Window.RenderSize.Y));
 
 			// RENDER TO FRAME
-			board.Render(batch);
+			if (gameState == .Menu)
+				menu.Render(batch);
+			else board.Render(batch);
 
 			if (DebugRender)
 				batch.Rect(.(pixelMousePos, .One), .White);
@@ -199,12 +240,18 @@ namespace NecroCard
 
 			// RENDER TO SCREEN
 			RenderFrame(batch);
-			board.RenderHiRes(batch);
+
+			if (gameState == .Menu)
+				menu.RenderHiRes(batch);
+			else
+				board.RenderHiRes(batch);
 
 			if (debugRender)
 				Performance.Render(batch, font);
 
-			batch.Render(Core.Window, .Black);
+			//batch.Image(Core.Assets.[Friend]atlas[0]);
+
+			batch.Render(Core.Window, .DarkText);
 		}
 
 		public void RestartBoard()
@@ -215,9 +262,16 @@ namespace NecroCard
 			gameState = .Playing;
 		}
 
+		public void LoadGame()
+		{
+			if (board != null) delete board;
+			board = new Board(true);
+			gameState = .Playing;
+		}
+
 		public void LoadMenu()
 		{
-			Log.Debug("MENU");
+			gameState = .Menu;
 		}
 
 		public Point2 Center => FrameSize / 2;

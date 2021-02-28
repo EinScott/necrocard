@@ -6,6 +6,13 @@ Name = "NecroCard"
 StartupObject = "Pile.EntryPoint"
 Aliases = ["PileGame"]
 
+[Platform.Windows]
+IconFile = "$(WorkspaceDir)/assets/icon.ico"
+Description = "A card game made for the Wowie 3.0 game jam"
+Company = "EinBurgbauer"
+Product = "Necro Card"
+ProductVersion = "1.0"
+
 [Configs.Debug.Win32]
 PostBuildCmds = ["Execute(\"$(BuildDir)/$(ProjectName).exe -packager\")"]
 

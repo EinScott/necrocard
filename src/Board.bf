@@ -11,6 +11,27 @@ namespace NecroCard
 		public static Random rand = new Random() ~ delete _;
 	}
 
+	public enum ParticleType
+	{
+		case Attack = 0;
+		case Sacrifice = 1;
+		case Block = 2;
+	}
+
+	public struct Particle
+	{
+		public readonly ParticleType Type;
+		public Point2 position;
+		public Vector2 scale = .One;
+		public float lifetime = 0;
+
+		public this(ParticleType type, Point2 pos)
+		{
+			Type = type;
+			position = pos;
+		}
+	}
+
 	class Board
 	{
 		static int lastCard;
@@ -22,15 +43,21 @@ namespace NecroCard
 				allCards.Add(card);
 			}
 
-			Register!(new Card("Thork", 1, 5, 0));
-			Register!(new Card("Bacat", 3, 2, 1));
-			Register!(new Card("Quak", 5, 1, 2));
+			Register!(new Card("Thork", 7, 1, 0));
+			Register!(new Card("Bacat", 4, 4, 1));
+			Register!(new Card("Quak", 5, 2, 2));
+			Register!(new Card("Elok", 6, 3, 3));
+			Register!(new Card("Bleh", 3, 2, 4));
 		}
 
 		const Rect endscreenRestart = .(132, 84, 56, 14);
 		const Rect endscreenMenu = .(132, 101, 56, 14);
-		const Point2 endscreenText = .(132, 76);
+		const Point2 endscreenText = .(133, 76);
+		const int endscreenBoxWidth = 53;
 		const float GameEndDelay = 0.2f;
+		const int EmptyDamage = 2;
+
+		const Point2 hardAIIndicatorPosition = .(297, 150);
 
 		public CardLayout playerLayout = new CardLayout(this, -4, true) ~ delete _;
 		public CardLayout enemyLayout = new CardLayout(this, -(int)CardLayout.Size.Y - 8, false) ~ delete _;
@@ -38,38 +65,60 @@ namespace NecroCard
 		public Stats playerStats = new Stats(this, playerLayout, true) ~ delete _;
 		public Stats enemyStats = new Stats(this, enemyLayout, false) ~ delete _;
 
-		public Enemy enemy = new Enemy(enemyStats, enemyLayout) ~ delete _;
+		public Enemy enemy ~ delete _;
+
+		public List<Particle> particles = new List<Particle>() ~ delete _;
 
 		String resultString;
 		float gameEndDelayCounter;
 		bool gameEnds;
 		bool playerWon;
 		bool prevPlayerTurn;
+		int turn = 0;
 		public bool playerTurn = rand.Next(0, 2) == 1;
-
-		int playerEmptyLayoutTurns;
-		int enemyEmptyLayoutTurns;
 
 		bool endscreenRestartHover;
 		bool endscreenMenuHover;
 
-		public this()
+		public this(bool first = false)
 		{
 			// Hand out cards
 			for (int i < 4)
 			{
 				playerStats.DrawCard(true);
+			}
+
+			for (int i < 4)
+			{
 				enemyStats.DrawCard(true);
 			}
+
+			enemy = new Enemy(enemyStats, enemyLayout, first);
 		}
 
 		public void Render(Batch2D batch)
 		{
 			Draw.background.Asset.Draw(batch, 0, .Zero);
+
+			// Empty board warning
+			if (turn > 1) // Both have already played
+			{
+				if (playerLayout.count == 0)
+					Draw.warning.Asset.Draw(batch, 0, .(46, 109));
+
+				if (enemyLayout.count == 0)
+					Draw.warning.Asset.Draw(batch, 1, .(46, 8));
+			}
+
+			// Turn indicator
 			if (playerTurn)
 				Draw.turn.Asset.Draw(batch, 0, .(20, 165));
 			else
 				Draw.turn.Asset.Draw(batch, 0, .(264, 165));
+
+			// Hard ai indicator
+			if (enemy.hard)
+				Draw.hardAIIndicator.Asset.Draw(batch, 0, hardAIIndicatorPosition);
 
 			// Draw cards button
 			int frame = (playerStats.CanDrawCard() && !playerStats.buttonDown && playerTurn) ? 0 : 1;
@@ -81,6 +130,10 @@ namespace NecroCard
 
 			enemyLayout.Render(batch);
 			playerLayout.Render(batch);
+
+			// Particles
+			for (let part in ref particles)
+				Draw.particles.Asset.Draw(batch, part.Type.Underlying, part.position, part.scale);
 
 			enemyLayout.RenderTop(batch);
 			playerLayout.RenderTop(batch);
@@ -98,7 +151,7 @@ namespace NecroCard
 		// hi res overlay
 		public void RenderHiRes(Batch2D batch)
 		{
-			if (GameState == .Playing)
+			/*if (GameState == .Playing)
 			{
 				enemyLayout.RenderHiRes(batch);
 				playerLayout.RenderHiRes(batch);
@@ -108,11 +161,15 @@ namespace NecroCard
 
 				playerStats.RenderHiRes(batch);
 			}
-			else if(GameState == .GameEnd)
+			else*/ if(GameState == .GameEnd)
 			{
-				let baseScale = Vector2(((float)NecroCard.Instance.FrameScale / Draw.font.Size));
+				let textBoxWidth = NecroCard.Instance.FrameToWindow(.(endscreenBoxWidth)).X;
 
-				if (resultString != null) batch.Text(Draw.font, resultString, NecroCard.Instance.FrameToWindow(endscreenText), baseScale * 6, .Zero, 0, .DarkText);
+				let scale = Vector2(((float)NecroCard.Instance.FrameScale / Draw.font.Size)) * 6;
+				let widthNeeded = Draw.font.WidthOf(resultString) * scale.X;
+				let drawOffset = (int)Math.Floor((textBoxWidth - widthNeeded) / 2); // Center
+
+				if (resultString != null) batch.Text(Draw.font, resultString, NecroCard.Instance.FrameToWindow(endscreenText) + .(drawOffset, 0), scale, .Zero, 0, .DarkText);
 			}
 		}
 
@@ -143,47 +200,47 @@ namespace NecroCard
 					enemy.MakeMove();
 				}
 
+				// Particles
+				for (int i < particles.Count)
+				{
+					var part = ref particles[i];
+					part.lifetime += Time.Delta;
+
+					if (part.lifetime > 0.12f)
+					{
+						part.scale = Vector2.Lerp(part.scale, .(-0.2f, -0.2f), Time.Delta * 6);
+
+						if (part.scale.X < 0.1f)
+						{	
+							particles.RemoveAtFast(i);
+							i--;
+						}
+					}
+				}
+
 				// Test for winning/loosing conditions on turn change
 				if (prevPlayerTurn != playerTurn)
 				{
-					// Player had empty layout at end of turn
+					turn++;
 
-					if (prevPlayerTurn)
-					{
-						if (playerLayout.count == 0)
-							playerEmptyLayoutTurns++;
-						else playerEmptyLayoutTurns = 0;
-					}
+					// Empty board penalty
+					if (prevPlayerTurn && playerLayout.count == 0)
+						playerStats.health -= EmptyDamage;
+					else if (!prevPlayerTurn && enemyLayout.count == 0)
+						enemyStats.health -= EmptyDamage;
 
-					if (playerEmptyLayoutTurns > 1)
+					// Out of health "energy"
+					if (playerStats.health <= 0 && enemyStats.health <= 0)
 					{
 						gameEnds = true;
-						resultString = "No cards to defend YOU";
-
-						if (enemyLayout.count == 0)
-							resultString = "No cards to left, both loose";
+						resultString = "BOTH ran out of energy";
 					}
-
-					if (!prevPlayerTurn)
-					{
-						if (enemyLayout.count == 0)
-							enemyEmptyLayoutTurns++;
-						else enemyEmptyLayoutTurns = 0;
-					}
-
-					if (enemyEmptyLayoutTurns > 1)
-					{
-						playerWon = true;
-						gameEnds = true;
-						resultString = "No cards to defend COM";
-					}
-
-					if (prevPlayerTurn && playerStats.health <= 0)
+					else if (playerStats.health <= 0)
 					{
 						gameEnds = true;
 						resultString = "YOU ran out of energy";
 					}
-					else if (!prevPlayerTurn && enemyStats.health <= 0)
+					else if (enemyStats.health <= 0)
 					{
 						gameEnds = true;
 						playerWon = true;
@@ -210,7 +267,7 @@ namespace NecroCard
 						NecroCard.Instance.LoadMenu();
 				}
 			}
-			else
+			else if (gameEnds)
 			{
 				// Game end delay
 				if (gameEnds)

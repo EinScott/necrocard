@@ -61,8 +61,8 @@ namespace NecroCard
 					continue;
 				}
 
-				let yOffset = i == selected ? selectYOffset : 0;
-				card.Card.Draw(batch, bounds.Position + .(currentXOffset, yOffset));
+				let selectionOffset = i == selected ? selectYOffset : 0;
+				card.Card.Draw(batch, bounds.Position + .(currentXOffset, selectionOffset));
 
 				if (DebugRender)
 					batch.HollowRect(.(bounds.Position + .(currentXOffset, 0), Card.Size), 1, .Red);
@@ -83,7 +83,7 @@ namespace NecroCard
 			}
 		}
 
-		public void RenderHiRes(Batch2D batch)
+		/*public void RenderHiRes(Batch2D batch)
 		{
 			var currentXOffset = XDrawOffsetStart;
 			for(int i < cards.Count)
@@ -101,19 +101,19 @@ namespace NecroCard
 					continue;
 				}
 
-				let yOffset = i == selected ? selectYOffset : 0;
-				card.Card.DrawHiRes(batch, bounds.Position + .(currentXOffset, yOffset));
+				let selectionOffset = i == selected ? selectYOffset : 0;
+				card.Card.DrawHiRes(batch, bounds.Position + .(currentXOffset, selectionOffset));
 				currentXOffset += XDrawOffsetDelta;
 			}
-		}
+		}*/
 
-		public void RenderTopHiRes(Batch2D batch)
+		/*public void RenderTopHiRes(Batch2D batch)
 		{
 			if (dragging)
 			{
 				cards[[Unchecked]selected].Card.DrawHiRes(batch, dragPosition);
 			}
-		}
+		}*/
 
 		public void EnemySetSelectedDrag(int index)
 		{
@@ -137,7 +137,7 @@ namespace NecroCard
 			{
 				if (i == index)
 				{
-					return bounds.Position + .(currentXOffset, yOffset);
+					return bounds.Position + .(currentXOffset, 0);
 				}
 				currentXOffset += XDrawOffsetDelta;
 			}
@@ -181,11 +181,6 @@ namespace NecroCard
 					selected = -1;
 			}
 
-			if (dragging)
-			{
-				dragPosition = PixelMouse + dragOffset;
-			}
-
 			if (Core.Input.Mouse.Pressed(.Left) && selected >= 0)
 			{
 				dragging = true;
@@ -198,6 +193,7 @@ namespace NecroCard
 				int attacked = -1;
 				int attackOverlap = 0;
 				let draggingCardRect = Rect(PixelMouse + dragOffset, Card.Size);
+				Point2 attackPoint = .Zero;
 
 				// Select the one we overlap the most
 				for(int i < enemyCards.Count)
@@ -212,9 +208,11 @@ namespace NecroCard
 					let currentCardRect = Rect(Board.enemyLayout.Bounds.Position + .(currentXOffset, 0), Card.Size);
 					if (currentCardRect.Overlaps(draggingCardRect))
 					{
-						let overlapArea = currentCardRect.OverlapRect(draggingCardRect).Area;
+						let overlapRect = currentCardRect.OverlapRect(draggingCardRect);
+						let overlapArea = overlapRect.Area;
 						if (attackOverlap < overlapArea) // If we overlap this one more
 						{
+							attackPoint = overlapRect.Position + overlapRect.Size / 2;
 							attackOverlap = overlapArea;
 							attacked = i;
 						}
@@ -224,9 +222,14 @@ namespace NecroCard
 
 				// Attack if target was chosen
 				if (attacked >= 0)
-					Attack(selected, attacked);
+					Attack(selected, attacked, attackPoint);
 
 				dragging = false;
+			}
+
+			if (dragging)
+			{
+				dragPosition = PixelMouse + dragOffset;
 			}
 		}
 
@@ -245,13 +248,14 @@ namespace NecroCard
 			count++;
 		}
 
-		public void Attack(int attackerIndex, int attackedIndex)
+		public void Attack(int attackerIndex, int attackedIndex, Point2 position)
 		{
 			let other = (IsPlayer ? Board.enemyLayout : Board.playerLayout);
 
 			let attacker = ref cards[attackerIndex];
 			let attacked = ref other.cards[attackedIndex];
 
+			ParticleType type = .Attack;
 			if (attacker.Card.Active > attacked.Card.Active)
 			{
 				let otherStats = (IsPlayer ? Board.enemyStats : Board.playerStats);
@@ -261,11 +265,19 @@ namespace NecroCard
 			{
 				let myStats = (!IsPlayer ? Board.enemyStats : Board.playerStats);
 				myStats.health += attacker.Card.Energy;
+
+				type = .Sacrifice;
 			}
 			else
 			{
-				return; // @do @polish communicate this with particle. Indeed, add particles to attack actions, all of them
+				type = .Block;
 			}
+
+			// Emit particle
+			Board.particles.Add(.(type, position));
+
+			if (type == .Block)
+				return; // Nothing happens here
 
 			DestroyCard(attackerIndex);
 			other.DestroyCard(attackedIndex);
@@ -276,7 +288,7 @@ namespace NecroCard
 		public void DestroyCard(int index)
 		{
 			cards[index] = .(null);
-			count --;
+			count--;
 		}
 
 		[Inline]

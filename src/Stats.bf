@@ -24,7 +24,7 @@ namespace NecroCard
 		public this(Card card)
 		{
 			Card = card;
-			easePos = .(0, 64); // Below screen
+			easePos = .(0, 64); // Middle below screen
 			Position = easePos.Round();
 		}
 	}
@@ -62,22 +62,25 @@ namespace NecroCard
 		public void Update()
 		{
 			// Card position ease
+			var xOffset = drawStartXOffset;
 			for (let i < hand.Count)
 			{
 				if (i == selected)
 				{
 					hand[[Unchecked]i].EasePos = .(
-						0, // @cut easing when playing/ drawing cards
+						Math.Lerp(hand[[Unchecked]i].EasePos.X, xOffset, Time.Delta * 12),
 						Math.Lerp(hand[[Unchecked]i].EasePos.Y, PlayOffset, Time.Delta * 10)
 					);
 				}
 				else
 				{
 					hand[[Unchecked]i].EasePos = .(
-						0,
+						Math.Lerp(hand[[Unchecked]i].EasePos.X, xOffset, Time.Delta * 12),
 						Math.Lerp(hand[[Unchecked]i].EasePos.Y, 0, Time.Delta * 16)
 					);
 				}
+
+				xOffset += Card.Size.X + CardSpacing;
 			}
 		}
 
@@ -127,33 +130,29 @@ namespace NecroCard
 
 		public void Render(Batch2D batch)
 		{
-			var xOffset = drawStartXOffset;
 			for (int i < hand.Count)
 			{
 				let handCard = hand[[Unchecked]i];
-				handCard.Card.Draw(batch, Top + .(xOffset, handCard.Position.Y)); // @cut later easing to xOffset should be in update, this should just be .Position
+				handCard.Card.Draw(batch, Top + handCard.Position);
 
 				if (DebugRender)
-					batch.HollowRect(.(Top + .(xOffset, handCard.Position.Y), Card.Size), 1, .Red);
-
-				xOffset += Card.Size.X + CardSpacing;
+				{
+					batch.HollowRect(.(Top + handCard.Position, Card.Size), 1, .Red);
+				}
 			}
 
 			if (DebugRender)
 				batch.HollowRect(DrawButton, 1, .Green);
 		}
 
-		public void RenderHiRes(Batch2D batch)
+		/*public void RenderHiRes(Batch2D batch)
 		{
-			var xOffset = drawStartXOffset;
 			for (int i < hand.Count)
 			{
 				let handCard = hand[[Unchecked]i];
-				handCard.Card.DrawHiRes(batch, Top + .(xOffset, handCard.Position.Y));
-
-				xOffset += Card.Size.X + CardSpacing;
+				handCard.Card.DrawHiRes(batch, Top + handCard.Position);
 			}
-		}
+		}*/
 
 		[Inline]
 		public bool IsFull()
