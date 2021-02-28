@@ -27,8 +27,10 @@ namespace NecroCard
 			Register!(new Card("Quak", 5, 1, 2));
 		}
 
-		const Rect endscreenRestart = .(132, 78, 56, 14);
-		const Rect endscreenMenu = .(132, 95, 56, 14);
+		const Rect endscreenRestart = .(132, 84, 56, 14);
+		const Rect endscreenMenu = .(132, 101, 56, 14);
+		const Point2 endscreenText = .(132, 76);
+		const float GameEndDelay = 0.2f;
 
 		public CardLayout playerLayout = new CardLayout(this, -4, true) ~ delete _;
 		public CardLayout enemyLayout = new CardLayout(this, -(int)CardLayout.Size.Y - 8, false) ~ delete _;
@@ -38,6 +40,9 @@ namespace NecroCard
 
 		public Enemy enemy = new Enemy(enemyStats, enemyLayout) ~ delete _;
 
+		String resultString;
+		float gameEndDelayCounter;
+		bool gameEnds;
 		bool playerWon;
 		bool prevPlayerTurn;
 		public bool playerTurn = rand.Next(0, 2) == 1;
@@ -77,6 +82,9 @@ namespace NecroCard
 			enemyLayout.Render(batch);
 			playerLayout.Render(batch);
 
+			enemyLayout.RenderTop(batch);
+			playerLayout.RenderTop(batch);
+
 			playerStats.Render(batch);
 
 			if (GameState == .GameEnd)
@@ -95,12 +103,16 @@ namespace NecroCard
 				enemyLayout.RenderHiRes(batch);
 				playerLayout.RenderHiRes(batch);
 
+				enemyLayout.RenderTopHiRes(batch);
+				playerLayout.RenderTopHiRes(batch);
+
 				playerStats.RenderHiRes(batch);
 			}
 			else if(GameState == .GameEnd)
 			{
-				// @do print death reason
-				// for that, make more space in end screen for some text
+				let baseScale = Vector2(((float)NecroCard.Instance.FrameScale / Draw.font.Size));
+
+				if (resultString != null) batch.Text(Draw.font, resultString, NecroCard.Instance.FrameToWindow(endscreenText), baseScale * 6, .Zero, 0, .DarkText);
 			}
 		}
 
@@ -112,7 +124,7 @@ namespace NecroCard
 
 		public void Update()
 		{
-			if (GameState == .Playing)
+			if (GameState == .Playing && !gameEnds)
 			{
 				prevPlayerTurn = playerTurn;
 
@@ -135,7 +147,6 @@ namespace NecroCard
 				if (prevPlayerTurn != playerTurn)
 				{
 					// Player had empty layout at end of turn
-					bool gameEnds = false;
 
 					if (prevPlayerTurn)
 					{
@@ -145,7 +156,13 @@ namespace NecroCard
 					}
 
 					if (playerEmptyLayoutTurns > 1)
+					{
 						gameEnds = true;
+						resultString = "No cards to defend YOU";
+
+						if (enemyLayout.count == 0)
+							resultString = "No cards to left, both loose";
+					}
 
 					if (!prevPlayerTurn)
 					{
@@ -158,22 +175,25 @@ namespace NecroCard
 					{
 						playerWon = true;
 						gameEnds = true;
+						resultString = "No cards to defend COM";
 					}
 
 					if (prevPlayerTurn && playerStats.health <= 0)
 					{
 						gameEnds = true;
+						resultString = "YOU ran out of energy";
 					}
 					else if (!prevPlayerTurn && enemyStats.health <= 0)
 					{
 						gameEnds = true;
 						playerWon = true;
+						resultString = "COM ran out of energy";
 					}
 
 					if (gameEnds)
 					{
 						Log.Debug($"Game Ends. PlayerWins {playerWon}");
-						GameState = .GameEnd;
+						gameEndDelayCounter = GameEndDelay;
 					}
 				}
 			}
@@ -190,7 +210,17 @@ namespace NecroCard
 						NecroCard.Instance.LoadMenu();
 				}
 			}
-			else Debug.FatalError("you shouldn't be calling update or render on this right now!");
+			else
+			{
+				// Game end delay
+				if (gameEnds)
+					gameEndDelayCounter -= Time.Delta;
+
+				if (gameEnds && gameEndDelayCounter <= 0)
+				{
+					GameState = .GameEnd;
+				}
+			}
 		}
 
 		public Card DrawCard()

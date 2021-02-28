@@ -5,6 +5,7 @@ namespace NecroCard
 {
 	public class CardLayout
 	{
+		const int selectYOffset = -1;
 		const int MaxCardCapacity = 5;
 		const int XDrawOffsetDelta = (int)(float)Size.X / MaxCardCapacity;
 		const int XDrawOffsetStart = -(XDrawOffsetDelta - Card.Size.Y - 4) / 2;
@@ -30,9 +31,10 @@ namespace NecroCard
 		Rect bounds;
 		public Rect Bounds => bounds;
 
-		int selected;
+		int selected = -1;
 		bool dragging;
 		Point2 dragOffset;
+		public Point2 dragPosition;
 
 		public this(Board board, int yPos, bool player)
 		{
@@ -59,7 +61,8 @@ namespace NecroCard
 					continue;
 				}
 
-				card.Card.Draw(batch, bounds.Position + .(currentXOffset, 0));
+				let yOffset = i == selected ? selectYOffset : 0;
+				card.Card.Draw(batch, bounds.Position + .(currentXOffset, yOffset));
 
 				if (DebugRender)
 					batch.HollowRect(.(bounds.Position + .(currentXOffset, 0), Card.Size), 1, .Red);
@@ -67,15 +70,17 @@ namespace NecroCard
 				currentXOffset += XDrawOffsetDelta;
 			}
 
-
-			if (dragging)
-			{
-				cards[[Unchecked]selected].Card.Draw(batch, PixelMouse + dragOffset);
-			}
-
 			// DEBUG
 			if (DebugRender)
 				batch.HollowRect(Bounds, 1, .Gray);
+		}
+
+		public void RenderTop(Batch2D batch)
+		{
+			if (dragging)
+			{
+				cards[[Unchecked]selected].Card.Draw(batch, dragPosition);
+			}
 		}
 
 		public void RenderHiRes(Batch2D batch)
@@ -96,14 +101,48 @@ namespace NecroCard
 					continue;
 				}
 
-				card.Card.DrawHiRes(batch, bounds.Position + .(currentXOffset, 0));
+				let yOffset = i == selected ? selectYOffset : 0;
+				card.Card.DrawHiRes(batch, bounds.Position + .(currentXOffset, yOffset));
+				currentXOffset += XDrawOffsetDelta;
+			}
+		}
+
+		public void RenderTopHiRes(Batch2D batch)
+		{
+			if (dragging)
+			{
+				cards[[Unchecked]selected].Card.DrawHiRes(batch, dragPosition);
+			}
+		}
+
+		public void EnemySetSelectedDrag(int index)
+		{
+			selected = index;
+			dragging = true;
+
+			// Find current drag start position
+			dragPosition = EnemyGetCardPos(selected);
+		}
+
+		public void EnemyEndDrag()
+		{
+			selected = -1;
+			dragging = false;
+		}
+
+		public Point2 EnemyGetCardPos(int index)
+		{
+			var currentXOffset = XDrawOffsetStart;
+			for(int i < cards.Count)
+			{
+				if (i == index)
+				{
+					return bounds.Position + .(currentXOffset, yOffset);
+				}
 				currentXOffset += XDrawOffsetDelta;
 			}
 
-			if (dragging)
-			{
-				cards[[Unchecked]selected].Card.DrawHiRes(batch, PixelMouse + dragOffset);
-			}
+			return .Zero;
 		}
 
 		public void Update()
@@ -131,7 +170,7 @@ namespace NecroCard
 					{
 						selected = i;
 
-						dragOffset = (bounds.Position + .(currentXOffset, 0)) - PixelMouse;
+						dragOffset = (bounds.Position + .(currentXOffset, selectYOffset)) - PixelMouse;
 						somethingSelected = true;
 						break;
 					}
@@ -142,11 +181,15 @@ namespace NecroCard
 					selected = -1;
 			}
 
+			if (dragging)
+			{
+				dragPosition = PixelMouse + dragOffset;
+			}
+
 			if (Core.Input.Mouse.Pressed(.Left) && selected >= 0)
 			{
 				dragging = true;
 			}
-
 			else if (dragging && !Core.Input.Mouse.Down(.Left))
 			{
 				// Look for overlaps

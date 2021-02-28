@@ -140,13 +140,14 @@ namespace NecroCard
 				Core.Assets.UnloadPackage("fonts");
 			}
 
+			// LOAD CONTENT PACKAGE
+			Core.Assets.LoadPackage("content");
+
 			// Music
 			theme = Core.Assets.Get<AudioClip>("theme");
 			music = new GlobalSource(null, true);
-			music.Play(theme);
-
-			// LOAD CONTENT PACKAGE
-			Core.Assets.LoadPackage("content");
+			music.Looping = true;
+			if (theme != null) music.Play(theme);
 
 			// SETUP RENDERING STUFF
 			material = new Material(shader);
