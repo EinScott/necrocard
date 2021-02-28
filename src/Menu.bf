@@ -33,7 +33,8 @@ namespace NecroCard
 			  of your card
 			""";
 		const Point2 tutorialCardHandPos = .(244, 141);
-		const Point2 tutorialEnemyCardHandPos = .(244, 13);
+		const Point2 tutorialCardLayoutPos = .(244, 73);
+		const Point2 tutorialEnemyCardLayoutPos = .(244, 13);
 		const Rect tutorialBackButton = .(166, 64, 32, 13);
 
 		float logoSin;
@@ -41,6 +42,9 @@ namespace NecroCard
 		bool tutorial;
 
 		int tutorialStage = 0;
+		float tutorialCardOffset;
+		Point2 tutorialDragOffset;
+		bool dragging;
 
 		public void Update()
 		{
@@ -77,6 +81,39 @@ namespace NecroCard
 
 				// Interactive tutorial
 				if (tutorialStage == 0)
+				{
+					if (Rect(tutorialCardHandPos, Card.Size).Contains(PixelMouse))
+					{
+						tutorialCardOffset = Math.Lerp(tutorialCardOffset, Stats.PlayOffset, Time.Delta * 10);
+
+						if (click)
+							tutorialStage = 1;
+					}
+					else tutorialCardOffset = Math.Lerp(tutorialCardOffset, 0, Time.Delta * 16);
+				}
+				else if (tutorialStage == 1)
+				{
+					if (Rect(tutorialCardLayoutPos, Card.Size).Contains(PixelMouse))
+					{
+						tutorialCardOffset = -1;
+
+						if (click)
+						{
+							dragging = true;
+							tutorialDragOffset = tutorialCardLayoutPos + .(0, (int)tutorialCardOffset) - PixelMouse;
+						}
+					}
+					else tutorialCardOffset = 0;
+
+					if (dragging && !Core.Input.Mouse.Down(.Left))
+					{
+						// Drag end
+						if (Rect(tutorialEnemyCardLayoutPos, Card.Size).Overlaps(Rect(PixelMouse + tutorialDragOffset, Card.Size)))
+							tutorialStage = 2;
+
+						dragging = false;
+					}
+				}
 			}
 		}
 
@@ -94,10 +131,19 @@ namespace NecroCard
 			}
 			else
 			{
-				Draw.cards.Asset.Draw(batch, 5, tutorialCardHandPos);
-				Draw.cards.Asset.Draw(batch, 5, tutorialEnemyCardHandPos);
-
 				Draw.backButton.Asset.Draw(batch, focusedButton == 4 ? 1 : 0, tutorialBackButton.Position);
+
+				// Tutorial
+				if (tutorialStage < 2)
+					Draw.cards.Asset.Draw(batch, 5, tutorialEnemyCardLayoutPos);
+
+				if (tutorialStage == 0)
+					Draw.cards.Asset.Draw(batch, 5, tutorialCardHandPos + .(0, (int)tutorialCardOffset));
+				else if (tutorialStage == 1)
+				{
+					let pos = dragging ? PixelMouse + tutorialDragOffset : tutorialCardLayoutPos + .(0, (int)tutorialCardOffset); // @do report bug: having this integrate in call below will error codegen
+					Draw.cards.Asset.Draw(batch, 5, pos);
+				}
 			}
 		}
 

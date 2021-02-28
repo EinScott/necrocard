@@ -48,6 +48,7 @@ namespace NecroCard
 			Register!(new Card("Quak", 5, 2, 2));
 			Register!(new Card("Elok", 6, 3, 3));
 			Register!(new Card("Bleh", 3, 2, 4));
+			Register!(new Card("Snek", 5, 4, 6)); // index 5 is "none"
 		}
 
 		const Rect endscreenRestart = .(132, 84, 56, 14);
@@ -163,7 +164,7 @@ namespace NecroCard
 			}
 			else*/ if(GameState == .GameEnd)
 			{
-				let textBoxWidth = NecroCard.Instance.FrameToWindow(.(endscreenBoxWidth)).X;
+				let textBoxWidth = NecroCard.Instance.FrameToWindow(.(endscreenBoxWidth)).X - NecroCard.Instance.FrameToWindow(.Zero).X;
 
 				let scale = Vector2(((float)NecroCard.Instance.FrameScale / Draw.font.Size)) * 6;
 				let widthNeeded = Draw.font.WidthOf(resultString) * scale.X;

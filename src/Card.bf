@@ -10,7 +10,7 @@ namespace NecroCard
 		const Point2 energyOffset = .(23, 44);
 		//const int titleBoxLength = 20;
 
-		public String Name;
+		public String Name; // unused
 		public int Active;
 		public int Energy;
 		public int SpriteFrame;

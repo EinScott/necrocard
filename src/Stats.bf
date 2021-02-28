@@ -34,7 +34,7 @@ namespace NecroCard
 		// not the nicest code, is all over the place, but works
 
 		const int MaxHandCards = 4;
-		const int PlayOffset = -6;
+		public const int PlayOffset = -6;
 		const int CardSpacing = 4;
 		readonly Point2 Top = NecroCard.Instance.Center + .(0, Card.Size.Y / 2 + 8);
 		readonly Rect DrawButton = .(Top + .(-134, -5), .(31, 16));

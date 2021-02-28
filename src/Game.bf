@@ -247,7 +247,11 @@ namespace NecroCard
 				board.RenderHiRes(batch);
 
 			if (debugRender)
+			{
 				Performance.Render(batch, font);
+
+				//batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
+			}
 
 			//batch.Image(Core.Assets.[Friend]atlas[0]);
 
