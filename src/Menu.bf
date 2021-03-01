@@ -1,6 +1,8 @@
 using Pile;
 using System;
 
+using internal NecroCard;
+
 namespace NecroCard
 {
 	class Menu
@@ -11,10 +13,10 @@ namespace NecroCard
 		const Point2 logoPos = .(127, 19);
 		const Point2 tutorialBoxPos = .(122, 79);
 		const String tutorialText = """
-			- whoever reaches 0 energy first, looses
+			- whoever reaches 0 energy first, loses
 
 			- if you have no cards on the field at the
-			  end of your turn, you loose 2 energy
+			  end of your turn, you lose 2 energy
 
 			- click to play cards from you hand
 			  onto the field (consumes your turn)
@@ -39,6 +41,7 @@ namespace NecroCard
 
 		float logoSin;
 		uint8 focusedButton;
+		uint8 prevFocusedButton;
 		bool tutorial;
 
 		int tutorialStage = 0;
@@ -46,27 +49,80 @@ namespace NecroCard
 		Point2 tutorialDragOffset;
 		bool dragging;
 
+		bool tutorialPrevHoveredCard;
+
+		float sliderValue = 1;
+		const float SliderScale = 2;
+		const Rect SoundSliderBox = .(249, 185, 64, 5);
+		const Rect SoundSlider = .(249, 187, 64, 1);
+		const Rect SoundSliderControl = .(249, 185, 1, 5);
+		const Color SliderColor = .(77, 39, 39);
+
+		bool prevSliderFocused;
+
 		public void Update()
 		{
+			prevFocusedButton = focusedButton;
+
 			logoSin = (float)Math.Sin(Time.Duration.TotalSeconds * 2) * 4;
 			bool click = Core.Input.Mouse.Pressed(.Left);
 
 			if (!tutorial)
 			{
+				if (SoundSliderBox.Contains(PixelMouse))
+				{
+					if (!prevSliderFocused)
+					{
+						SoundSource.Play(Sound.buttonHover);
+						prevSliderFocused = true;
+					}
+
+					// Slider controls
+					if (Core.Input.Mouse.Down(.Left))
+					{
+						let diff = PixelMouse.X - SoundSliderBox.X;
+						sliderValue = ((float)diff / SoundSliderBox.Width) * SliderScale;
+
+						NecroCard.Instance.music.Volume = sliderValue;
+						NecroCard.Instance.sounds.Volume = sliderValue;
+					}
+				}
+				else prevSliderFocused = false;
+
 				if (tutorialButton.Contains(PixelMouse))
 				{
 					focusedButton = 1;
-					if (click) tutorial = true;
+					if (click)
+					{
+						tutorial = true;
+						SoundSource.Play(Sound.buttonClick);
+					}
+					else if (prevFocusedButton != focusedButton)
+					{
+						SoundSource.Play(Sound.buttonHover);
+					}
 				}
 				else if (playButton.Contains(PixelMouse))
 				{
 					focusedButton = 2;
-					if (click) NecroCard.Instance.LoadGame();
+					if (click)
+					{
+						NecroCard.Instance.LoadGame();
+						SoundSource.Play(Sound.buttonClick);
+					}
+					else if (prevFocusedButton != focusedButton)
+					{
+						SoundSource.Play(Sound.buttonHover);
+					}
 				}
 				else if (quitButton.Contains(PixelMouse))
 				{
 					focusedButton = 3;
 					if (click) Core.Exit();
+					else if (prevFocusedButton != focusedButton)
+					{
+						SoundSource.Play(Sound.buttonHover);
+					}
 				}
 				else focusedButton = 0;
 			}
@@ -75,7 +131,15 @@ namespace NecroCard
 				if (tutorialBackButton.Contains(PixelMouse))
 				{
 					focusedButton = 4;
-					if (click) tutorial = false;
+					if (click)
+					{
+						tutorial = false;
+						SoundSource.Play(Sound.buttonClick);
+					}
+					else if (prevFocusedButton != focusedButton)
+					{
+						SoundSource.Play(Sound.buttonHover);
+					}
 				}
 				else focusedButton = 0;
 
@@ -87,9 +151,22 @@ namespace NecroCard
 						tutorialCardOffset = Math.Lerp(tutorialCardOffset, Stats.PlayOffset, Time.Delta * 10);
 
 						if (click)
+						{
 							tutorialStage = 1;
+							SoundSource.Play(Sound.cardPlay);
+						}
+
+						if (!tutorialPrevHoveredCard)
+						{
+							SoundSource.Play(Sound.cardHover);
+							tutorialPrevHoveredCard = true;
+						}
 					}
-					else tutorialCardOffset = Math.Lerp(tutorialCardOffset, 0, Time.Delta * 16);
+					else
+					{
+						tutorialPrevHoveredCard = false;
+						tutorialCardOffset = Math.Lerp(tutorialCardOffset, 0, Time.Delta * 16);
+					}
 				}
 				else if (tutorialStage == 1)
 				{
@@ -101,15 +178,30 @@ namespace NecroCard
 						{
 							dragging = true;
 							tutorialDragOffset = tutorialCardLayoutPos + .(0, (int)tutorialCardOffset) - PixelMouse;
+							SoundSource.Play(Sound.cardClick);
+						}
+
+						if (!tutorialPrevHoveredCard)
+						{
+							SoundSource.Play(Sound.cardHover);
+							tutorialPrevHoveredCard = true;
 						}
 					}
-					else tutorialCardOffset = 0;
+					else
+					{
+						tutorialPrevHoveredCard = false;
+						tutorialCardOffset = 0;
+					}
 
 					if (dragging && !Core.Input.Mouse.Down(.Left))
 					{
 						// Drag end
 						if (Rect(tutorialEnemyCardLayoutPos, Card.Size).Overlaps(Rect(PixelMouse + tutorialDragOffset, Card.Size)))
+						{
 							tutorialStage = 2;
+							SoundSource.Play(Sound.cardAttack);
+						}
+						else SoundSource.Play(Sound.cardClick);
 
 						dragging = false;
 					}
@@ -128,6 +220,10 @@ namespace NecroCard
 				Draw.tutorialButton.Asset.Draw(batch, focusedButton == 1 ? 1 : 0, tutorialButton.Position);
 				Draw.playButton.Asset.Draw(batch, focusedButton == 2 ? 1 : 0, playButton.Position);
 				Draw.quitButton.Asset.Draw(batch, focusedButton == 3 ? 1 : 0, quitButton.Position);
+
+				// Slider
+				batch.Rect(SoundSlider, SliderColor);
+				batch.Rect(.(SoundSliderControl.Position + .((int)Math.Round((sliderValue / SliderScale) * SoundSlider.Size.X), 0), SoundSliderControl.Size), SliderColor);
 			}
 			else
 			{

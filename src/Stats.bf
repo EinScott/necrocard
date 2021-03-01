@@ -46,10 +46,12 @@ namespace NecroCard
 		int drawStartXOffset = 0;
 		int selected = -1;
 		bool firstTurn = true;
+		int prevSelected = -1;
 
 		public int health = 20;
 
 		public bool buttonDown;
+		bool prevButtonDown;
 
 		public this(Board board, CardLayout layout, bool player)
 		{
@@ -89,6 +91,8 @@ namespace NecroCard
 		{
 			// Card hovering
 			{
+				prevSelected = selected;
+
 				var Xoffset = drawStartXOffset;
 				bool somethingSelected = false;
 				for (let i < hand.Count)
@@ -104,7 +108,13 @@ namespace NecroCard
 				}
 
 				if (!somethingSelected)
+				{
 					selected = -1;
+				}
+				else if (prevSelected != selected)
+				{
+					SoundSource.Play(Sound.cardHover);
+				}
 			}
 
 			// Click events
@@ -121,11 +131,17 @@ namespace NecroCard
 				// Draw cards
 				else if (DrawButton.Contains(PixelMouse))
 				{
-					DrawCard();
+					if (CanDrawCard())
+						SoundSource.Play(Sound.buttonClick);
+
+					DrawCard(); // Can draw card is check in function
 				}
 			}
 
+			prevButtonDown = buttonDown;
 			buttonDown = Core.Input.Mouse.Down(.Left) && DrawButton.Contains(PixelMouse);
+			if (!prevButtonDown && buttonDown)
+				SoundSource.Play(Sound.buttonHover);
 		}
 
 		public void Render(Batch2D batch)
@@ -172,7 +188,10 @@ namespace NecroCard
 			drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
 
 			if (!force)
+			{
+				SoundSource.Play(Sound.cardShuffle);
 				EndTurn();
+			}
 		}
 		
 		public void PlayCard(int index)
@@ -187,6 +206,7 @@ namespace NecroCard
 			hand.RemoveAt(index);
 			drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
 
+			SoundSource.Play(Sound.cardPlay);
 			Layout.PlayCard(card.Card);
 			EndTurn();
 		}

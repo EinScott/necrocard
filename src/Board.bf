@@ -83,6 +83,8 @@ namespace NecroCard
 
 		public this(bool first = false)
 		{
+			SoundSource.Play(Sound.cardShuffle);
+
 			// Hand out cards
 			for (int i < 4)
 			{
@@ -257,15 +259,27 @@ namespace NecroCard
 			}
 			else if (GameState == .GameEnd)
 			{
+				bool prevRestartHover = endscreenRestartHover;
+				bool prevMenuHover = endscreenMenuHover;
 				endscreenRestartHover = endscreenRestart.Contains(PixelMouse);
 				endscreenMenuHover = endscreenMenu.Contains(PixelMouse);
+
+				if (endscreenRestartHover && !prevRestartHover
+					|| endscreenMenuHover && !prevMenuHover)
+					SoundSource.Play(Sound.buttonHover);
 
 				if (Core.Input.Mouse.Pressed(.Left))
 				{
 					if (endscreenRestartHover)
+					{
+						SoundSource.Play(Sound.buttonClick);
 						NecroCard.Instance.RestartBoard();
+					}
 					else if (endscreenMenuHover)
+					{
+						SoundSource.Play(Sound.buttonClick);
 						NecroCard.Instance.LoadMenu();
+					}
 				}
 			}
 			else if (gameEnds)
@@ -277,6 +291,9 @@ namespace NecroCard
 				if (gameEnds && gameEndDelayCounter <= 0)
 				{
 					GameState = .GameEnd;
+					if (playerWon)
+						SoundSource.Play(Sound.win);
+					//else SoundSource.Play(Sound.cardAttack);
 				}
 			}
 		}

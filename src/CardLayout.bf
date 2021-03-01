@@ -36,6 +36,8 @@ namespace NecroCard
 		Point2 dragOffset;
 		public Point2 dragPosition;
 
+		int prevSelected = -1;
+
 		public this(Board board, int yPos, bool player)
 		{
 			YOffset = yPos;
@@ -122,6 +124,8 @@ namespace NecroCard
 
 			// Find current drag start position
 			dragPosition = EnemyGetCardPos(selected);
+
+			SoundSource.Play(Sound.cardClick);
 		}
 
 		public void EnemyEndDrag()
@@ -155,6 +159,8 @@ namespace NecroCard
 			// Selection
 			if (!dragging)
 			{
+				prevSelected = selected;
+
 				var currentXOffset = XDrawOffsetStart;
 				bool somethingSelected = false;
 				for(int i < cards.Count)
@@ -178,12 +184,19 @@ namespace NecroCard
 				}
 
 				if (!somethingSelected)
+				{
 					selected = -1;
+				}
+				else if (prevSelected != selected)
+				{
+					SoundSource.Play(Sound.cardHover);
+				}
 			}
 
 			if (Core.Input.Mouse.Pressed(.Left) && selected >= 0)
 			{
 				dragging = true;
+				SoundSource.Play(Sound.cardClick);
 			}
 			else if (dragging && !Core.Input.Mouse.Down(.Left))
 			{
@@ -223,6 +236,7 @@ namespace NecroCard
 				// Attack if target was chosen
 				if (attacked >= 0)
 					Attack(selected, attacked, attackPoint);
+				else SoundSource.Play(Sound.cardClick);
 
 				dragging = false;
 			}
@@ -260,6 +274,8 @@ namespace NecroCard
 			{
 				let otherStats = (IsPlayer ? Board.enemyStats : Board.playerStats);
 				otherStats.health -= attacker.Card.Active;
+
+				SoundSource.Play(Sound.cardAttack);
 			}
 			else if (attacker.Card.Active < attacked.Card.Active)
 			{
@@ -267,10 +283,12 @@ namespace NecroCard
 				myStats.health += attacker.Card.Energy;
 
 				type = .Sacrifice;
+				SoundSource.Play(Sound.cardHeal);
 			}
 			else
 			{
 				type = .Block;
+				SoundSource.Play(Sound.cardBlock);
 			}
 
 			// Emit particle

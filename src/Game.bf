@@ -34,6 +34,38 @@ namespace NecroCard
 			get => NecroCard.Instance.gameState;
 			set => NecroCard.Instance.gameState = value;
 		}
+
+		[Inline]
+		public static GlobalSource SoundSource => NecroCard.Instance.sounds;
+	}
+
+	static class Sound
+	{
+		// these could also be assets, but we wont reload them so...
+		public static AudioClip buttonClick;
+		public static AudioClip buttonHover;
+		public static AudioClip cardAttack;
+		public static AudioClip cardBlock;
+		public static AudioClip cardHeal;
+		public static AudioClip cardHover;
+		public static AudioClip cardPlay;
+		public static AudioClip cardShuffle;
+		public static AudioClip cardClick;
+		public static AudioClip win;
+
+		internal static void Get()
+		{
+			buttonClick = Core.Assets.Get<AudioClip>("button_click");
+			buttonHover = Core.Assets.Get<AudioClip>("button_hover");
+			cardAttack = Core.Assets.Get<AudioClip>("card_attack");
+			cardBlock = Core.Assets.Get<AudioClip>("card_block");
+			cardHeal = Core.Assets.Get<AudioClip>("card_heal");
+			cardHover = Core.Assets.Get<AudioClip>("card_hover");
+			cardPlay = Core.Assets.Get<AudioClip>("card_play");
+			cardShuffle = Core.Assets.Get<AudioClip>("card_shuffle");
+			cardClick = Core.Assets.Get<AudioClip>("card_click");
+			win = Core.Assets.Get<AudioClip>("win");
+		}
 	}
 
 	static class Draw
@@ -115,7 +147,8 @@ namespace NecroCard
 		public bool debugRender;
 
 		AudioClip theme;
-		GlobalSource music ~ delete _;
+		internal GlobalSource music ~ delete _;
+		internal GlobalSource sounds ~ delete _;
 
 		public SpriteFont font ~ delete _;
 		public Board board ~ DeleteNotNull!(_);
@@ -180,7 +213,11 @@ namespace NecroCard
 			theme = Core.Assets.Get<AudioClip>("theme");
 			music = new GlobalSource(null, true);
 			music.Looping = true;
-			if (theme != null) music.Play(theme);
+			music.Play(theme);
+
+			// Sounds
+			Sound.Get();
+			sounds = new GlobalSource();
 
 			// SETUP RENDERING STUFF
 			material = new Material(shader);
