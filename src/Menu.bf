@@ -26,7 +26,7 @@ namespace NecroCard
 
 			- two cards with equal attack can't fight
 
-			- in a fight, if your cards' attack is
+			- in a fight, if your card's attack is
 			  greater, the enemy takes that amount of
 			  damage
 			  if it is smaller, you gain the energy

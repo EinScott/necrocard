@@ -23,7 +23,7 @@ namespace NecroCard
 		{
 			Stats = stats;
 			Layout = layout;
-			hard = !first && rand.Next(0, 3) == 0;
+			hard = (!first && rand.Next(0, 3) == 0 || Core.Input.Keyboard.Shift);
 			Log.Debug(hard);
 		}
 
@@ -77,7 +77,7 @@ namespace NecroCard
 					break;
 				}
 
-				Card onlyCard = null;
+				int onlyAttack = 0;
 				for (int i < Layout.cards.Count)
 				{
 					let myCard = ref Layout.cards[i];
@@ -85,9 +85,9 @@ namespace NecroCard
 					if (myCard.Card == null)
 						continue;
 
-					if (onlyCard == null)
-						onlyCard = myCard.Card;
-					else if (myCard.Card != onlyCard)
+					if (onlyAttack == 0)
+						onlyAttack = myCard.Card.Active;
+					else if (myCard.Card.Active != onlyAttack)
 						break CANATTACK;
 				}
 
@@ -98,7 +98,7 @@ namespace NecroCard
 					if (otherCard.Card == null)
 						continue;
 
-					if (otherCard.Card != onlyCard)
+					if (otherCard.Card.Active != onlyAttack)
 						break CANATTACK;
 				}
 
