@@ -108,32 +108,32 @@ namespace NecroCard
 			// all these actions have chances so that this thing does dumb stuff!
 
 			// if the board is even and i have less than normal health and can play the next turn, attack
-			if (hard && canAttack && (Layout.count >= 2 || Layout.count == 1 && Stats.health > 6) && Layout.count == Stats.[Friend]Board.playerLayout.count && Stats.hand.Count >= 1 && rand.Next(0, 6) < 2)
+			if (hard && canAttack && (Layout.count >= 2 || Layout.count == 1 && Stats.health > 6) && Layout.count == Stats.[Friend]Board.playerLayout.count && Stats.hand.Count >= 1 && rand.XinYChance(2, 6))
 				Attack();
 
-			else if (hard && Stats.health > Stats.[Friend]Board.playerStats.health && Layout.count > 0 && Stats.hand.Count > 0 &&  rand.Next(0, 5) < 2)
+			else if (hard && canAttack && Stats.health > Stats.[Friend]Board.playerStats.health && Stats.hand.Count > 0 && rand.XinYChance(2, 5))
 				Attack();
 
 			// if i have more cards than the player, attack
-			else if (hard && canAttack && Layout.count > Stats.[Friend]Board.playerLayout.count && rand.Next(0, 4) < 2)
+			else if (hard && canAttack && Layout.count > Stats.[Friend]Board.playerLayout.count && rand.XinYChance(2, 4))
 				Attack();
 
 			// if my board is empty try to play card that is equal to the card played by the player
-			else if (Layout.count <= 1 && Stats.hand.Count > 0 && rand.Next(0, 8) < 7)
+			else if (Layout.count <= 1 && Stats.hand.Count > 0 && rand.XinYChance(7, 8))
 				PlayACard();
 
 			// Chance of drawing cards
-			else if (Stats.hand.Count < 2 && rand.Next(0, Layout.count * 2 + 1) < 2)
+			else if (Stats.hand.Count < 2 && rand.XinYChance(2, Layout.count * 2 + 1))
 				DrawCard();
 
 			// Chance of attacking cards
-			else if (canAttack && rand.Next(0, 6 - Layout.count) <= 2 && (!hard || Stats.health > 2))
+			else if (canAttack && rand.XinYChance(3, 6 - Layout.count) && (!hard || (Stats.health > 2 && Layout.count == 1 || Layout.count > 1)))
 				Attack();
 
-			else if (Stats.hand.Count > 0 && rand.Next(0, 3) <= 1)
+			else if (Stats.hand.Count > 0 && rand.XinYChance(2, 3))
 				PlayACard();
 
-			else if (rand.Next(0, 2) == 0)
+			else if (rand.XinYChance(1, 2))
 				DrawCard();
 
 			if (attacking)
@@ -159,7 +159,7 @@ namespace NecroCard
 				let otherLayout = Stats.[Friend]Board.playerLayout;
 
 				bool cardPlayed = false;
-				if (Layout.count == 0 && rand.Next(0, 6) <= 4)
+				if (Layout.count == 0 && rand.XinYChance(5, 6))
 				{
 					// We should play a card at best equal to the players card
 					int highestActiveIndex = -1;
@@ -226,7 +226,7 @@ namespace NecroCard
 				if (otherLayout.count == 0)
 					return;
 				
-				if (Stats.health < otherStats.health || rand.Next(0, 4) == 0)
+				if (Stats.health < otherStats.health || rand.XinYChance(1, 4))
 				{
 					// We should get some health
 					// attackingCard Has the highest energy and we can sacrifice it
@@ -242,7 +242,7 @@ namespace NecroCard
 							|| Layout.cards[attackingCard].Card.Energy == myCard.Card.Energy && Layout.cards[attackingCard].Card.Active <= myCard.Card.Active))
 							continue;
 
-						if (rand.Next(0, 6) == 0)
+						if (rand.XinYChance(1, 6))
 							continue; // Overlook this possibility
 
 						// Can we sacrifice it?
@@ -263,7 +263,7 @@ namespace NecroCard
 					}
 				}
 
-				if (attackingCard == -1 && (Layout.count == Layout.cards.Count || rand.Next(0, 3) <= 1))
+				if (attackingCard == -1 && (Layout.count > Layout.cards.Count || rand.XinYChance(2, 3)))
 				{
 					// We should attack
 					// attackingCard Has the highest active and we can attack something with it

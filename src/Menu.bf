@@ -18,7 +18,7 @@ namespace NecroCard
 			- if you have no cards on the field at the
 			  end of your turn, you lose 2 energy
 
-			- click to play cards from you hand
+			- click to play cards from your hand
 			  onto the field (consumes your turn)
 
 			- drag cards onto enemy cards to
@@ -59,6 +59,7 @@ namespace NecroCard
 		const Color SliderColor = .(77, 39, 39);
 
 		bool prevSliderFocused;
+		bool sliderDragging;
 
 		public void Update()
 		{
@@ -69,7 +70,7 @@ namespace NecroCard
 
 			if (!tutorial)
 			{
-				if (SoundSliderBox.Contains(PixelMouse))
+				if (SoundSliderBox.Contains(PixelMouse) || sliderDragging)
 				{
 					if (!prevSliderFocused)
 					{
@@ -80,12 +81,15 @@ namespace NecroCard
 					// Slider controls
 					if (Core.Input.Mouse.Down(.Left))
 					{
-						let diff = PixelMouse.X - SoundSliderBox.X;
+						let diff = Math.Clamp(PixelMouse.X - SoundSliderBox.X, 0, SoundSliderBox.Width);
 						sliderValue = ((float)diff / SoundSliderBox.Width) * SliderScale;
 
 						NecroCard.Instance.music.Volume = sliderValue;
 						NecroCard.Instance.sounds.Volume = sliderValue;
+
+						sliderDragging = true;
 					}
+					else sliderDragging = false;
 				}
 				else prevSliderFocused = false;
 
@@ -237,7 +241,7 @@ namespace NecroCard
 					Draw.cards.Asset.Draw(batch, 5, tutorialCardHandPos + .(0, (int)tutorialCardOffset));
 				else if (tutorialStage == 1)
 				{
-					let pos = dragging ? PixelMouse + tutorialDragOffset : tutorialCardLayoutPos + .(0, (int)tutorialCardOffset); // @do report bug: having this integrate in call below will error codegen
+					let pos = dragging ? PixelMouse + tutorialDragOffset : tutorialCardLayoutPos + .(0, (int)tutorialCardOffset);
 					Draw.cards.Asset.Draw(batch, 5, pos);
 				}
 			}

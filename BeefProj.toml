@@ -9,9 +9,9 @@ Aliases = ["PileGame"]
 
 [Platform.Windows]
 IconFile = "$(WorkspaceDir)/assets/icon.ico"
-Description = "A card game made for the Wowie 3.0 game jam"
+Description = "Necro Card"
+Comments = "A game made for the Wowie 3 game jam"
 Company = "EinBurgbauer"
-Product = "Necro Card"
 ProductVersion = "1.0"
 
 [Configs.Debug.Win32]

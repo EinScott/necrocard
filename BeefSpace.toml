@@ -1,5 +1,5 @@
 FileVersion = 1
-Projects = {NecroCard = {Path = "."}, Pile = {Path = "../Pile/Pile"}, Pile_SDL2 = {Path = "../Pile/Implementations/System_SDL"}, Pile_SoLoud = {Path = "../Pile/Implementations/Audio_SoLoud"}, MiniZ = "*", FastNoiseLite = {Path = "../FastNoise_Beef"}, Pile_OpenGL = {Path = "../Pile/Implementations/Graphics_OpenGL"}, Dimtoo = {Path = "../Dimtoo"}}
+Projects = {NecroCard = {Path = "."}, Pile = {Path = "../Pile/Pile"}, Pile_SDL2 = {Path = "../Pile/Implementations/System_SDL"}, Pile_SoLoud = {Path = "../Pile/Implementations/Audio_SoLoud"}, MiniZ = "*", FastNoiseLite = {Path = "../FastNoise_Beef"}, Pile_OpenGL = {Path = "../Pile/Implementations/Graphics_OpenGL"}, Dimtoo = {Path = "../Dimtoo"}, "Atma.Json" = {Path = "C:/Program Files/BeefLang/BeefLibs/Atma.Json/src/Atma.Json"}}
 
 [Workspace]
 StartupProject = "NecroCard"

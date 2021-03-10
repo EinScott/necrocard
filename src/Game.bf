@@ -42,29 +42,43 @@ namespace NecroCard
 	static class Sound
 	{
 		// these could also be assets, but we wont reload them so...
-		public static AudioClip buttonClick;
-		public static AudioClip buttonHover;
-		public static AudioClip cardAttack;
-		public static AudioClip cardBlock;
-		public static AudioClip cardHeal;
-		public static AudioClip cardHover;
-		public static AudioClip cardPlay;
-		public static AudioClip cardShuffle;
-		public static AudioClip cardClick;
-		public static AudioClip win;
+		public static Asset<AudioClip> buttonClick;
+		public static Asset<AudioClip> buttonHover;
+		public static Asset<AudioClip> cardAttack;
+		public static Asset<AudioClip> cardBlock;
+		public static Asset<AudioClip> cardHeal;
+		public static Asset<AudioClip> cardHover;
+		public static Asset<AudioClip> cardPlay;
+		public static Asset<AudioClip> cardShuffle;
+		public static Asset<AudioClip> cardClick;
+		public static Asset<AudioClip> win;
 
-		internal static void Get()
+		internal static void Create()
 		{
-			buttonClick = Core.Assets.Get<AudioClip>("button_click");
-			buttonHover = Core.Assets.Get<AudioClip>("button_hover");
-			cardAttack = Core.Assets.Get<AudioClip>("card_attack");
-			cardBlock = Core.Assets.Get<AudioClip>("card_block");
-			cardHeal = Core.Assets.Get<AudioClip>("card_heal");
-			cardHover = Core.Assets.Get<AudioClip>("card_hover");
-			cardPlay = Core.Assets.Get<AudioClip>("card_play");
-			cardShuffle = Core.Assets.Get<AudioClip>("card_shuffle");
-			cardClick = Core.Assets.Get<AudioClip>("card_click");
-			win = Core.Assets.Get<AudioClip>("win");
+			buttonClick = new Asset<AudioClip>("button_click");
+			buttonHover = new Asset<AudioClip>("button_hover");
+			cardAttack = new Asset<AudioClip>("card_attack");
+			cardBlock = new Asset<AudioClip>("card_block");
+			cardHeal = new Asset<AudioClip>("card_heal");
+			cardHover = new Asset<AudioClip>("card_hover");
+			cardPlay = new Asset<AudioClip>("card_play");
+			cardShuffle = new Asset<AudioClip>("card_shuffle");
+			cardClick = new Asset<AudioClip>("card_click");
+			win = new Asset<AudioClip>("win");
+		}
+
+		internal static void Delete()
+		{
+			delete buttonClick;
+			delete buttonHover;
+			delete cardAttack;
+			delete cardBlock;
+			delete cardHeal;
+			delete cardHover;
+			delete cardPlay;
+			delete cardShuffle;
+			delete cardClick;
+			delete win;
 		}
 	}
 
@@ -138,6 +152,48 @@ namespace NecroCard
 		}
 	}
 
+	// "a magician's / necromancer's card game?"
+	// @do add interactive tutorial "magic rulebook"
+	// @do add different ai enemy "personalities"
+	// @do add more cards?
+	// @do find a way to increase strategic depth
+	// @do cleanup some code!
+	// @do fool around with multiplayer at some point?
+	// @do sound when you leave the board empty
+	// @do try drawing 2 cards
+	// @do show enemy card count
+	// @do draw button sound bug?
+	// @do opening animation/sequence, some lore!
+	// @do story mode? where there are a row of challengers to beat.
+
+	// @do default ai currently too aggressive
+
+	/**
+	(boards) randome effects? - on interval
+	number of stuff that was relevant in a move should be made more prominant
+	(maybe fly towards the display it changes)
+	enemy abilities (commander like)
+	card "mode"
+	cheaten?
+	make start of rounds better "opening"
+	fog of war cards
+	synergies of cards
+	-> activaten takes a turn
+	-> or combine cards?
+	- maybe tradoff (get less energy back)
+
+	different decks or unique cards per person
+
+	deck building?
+	-> if commander style abilities - maybe tie deck to commander
+
+	kek 0 0
+
+	maybe limit decks in some way, (when we have more cards)
+	each game should have a limited deck, maybe even the same one
+	they could be random, or rely on the commander or something
+	*/
+
 	[AlwaysInclude]
 	public class NecroCard : PixelGame<NecroCard>
 	{
@@ -161,7 +217,7 @@ namespace NecroCard
 			GameEnd,
 			Menu // includes tutorial, credits, options & play & exit
 		}
-
+		
 		public GameState gameState = .Menu;
 
 		public this() : base(.(320, 200))
@@ -216,7 +272,7 @@ namespace NecroCard
 			music.Play(theme);
 
 			// Sounds
-			Sound.Get();
+			Sound.Create();
 			sounds = new GlobalSource();
 
 			// SETUP RENDERING STUFF
@@ -228,37 +284,18 @@ namespace NecroCard
 
 			Draw.Create();
 			menu = new Menu();
+
+			Performance.Track = true;
 		}
 
 		protected override void Shutdown()
 		{
 			Draw.Delete();
+			Sound.Delete();
 			Core.Assets.UnloadPackage("content");
 		}
 
-		protected override void Update()
-		{
-			pixelMousePos = WindowToFrame(Core.Input.MousePosition);
-
-			if (gameState == .Menu)
-				menu.Update();
-			else board.Update();
-
-			if (Core.Input.Keyboard.Alt && Core.Input.Keyboard.Pressed(.Enter))
-			{
-				Core.Window.Fullscreen = !Core.Window.Fullscreen;
-			}	
-
-#if DEBUG
-			if (Core.Input.Keyboard.Pressed(.F1))
-				debugRender = !debugRender;
-			if (Core.Input.Keyboard.Pressed(.F3)) // Full reset
-			{
-				LoadGame();
-			}
-#endif
-		}
-
+		[PerfTrack]
 		protected override void Render()
 		{
 			batch.Clear();
@@ -293,6 +330,30 @@ namespace NecroCard
 			//batch.Image(Core.Assets.[Friend]atlas[0]);
 
 			batch.Render(Core.Window, .DarkText);
+		}
+
+		[PerfTrack]
+		protected override void Update()
+		{
+			pixelMousePos = WindowToFrame(Core.Input.MousePosition);
+
+			if (gameState == .Menu)
+				menu.Update();
+			else board.Update();
+
+			if (Core.Input.Keyboard.Alt && Core.Input.Keyboard.Pressed(.Enter))
+			{
+				Core.Window.Fullscreen = !Core.Window.Fullscreen;
+			}	
+
+#if DEBUG
+			if (Core.Input.Keyboard.Pressed(.F1))
+				debugRender = !debugRender;
+			if (Core.Input.Keyboard.Pressed(.F3)) // Full reset
+			{
+				LoadGame();
+			}
+#endif
 		}
 
 		public void RestartBoard()
