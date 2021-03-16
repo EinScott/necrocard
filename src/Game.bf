@@ -192,6 +192,11 @@ namespace NecroCard
 	maybe limit decks in some way, (when we have more cards)
 	each game should have a limited deck, maybe even the same one
 	they could be random, or rely on the commander or something
+
+	Problem: no insentive for more than two cards on the board, also the ai mostly starts trading if you dont
+	-> can be solved by some of the stuff here, probably
+
+	have button class? they should probably only focus and play sounds when the window is actually focused!
 	*/
 
 	[AlwaysInclude]
@@ -228,12 +233,24 @@ namespace NecroCard
 
 		static this()
 		{
+			EntryPoint.OnStart.Add(new => OnStart);
+		}
+
+		static Result<void> OnStart() // @do use this in pile example!
+		{
 			Texture.DefaultTextureFilter = .Nearest;
 
-			EntryPoint.Preferences.createGame = () => new NecroCard();
-			EntryPoint.Preferences.gameTitle = "NecroCard";
-			EntryPoint.Preferences.windowHeight = 200 * 4;
-			EntryPoint.Preferences.windowWidth = 320 * 4;
+			EntryPoint.Preferences = .()
+				{
+					createGame = () => new NecroCard(),
+					gameTitle = "NecroCard",
+					windowTitle = "Necro Card",
+					windowHeight = 200 * 4,
+					windowWidth = 320 * 4,
+					windowState = .Windowed
+				};
+
+			return .Ok;
 		}
 		
 		protected override void Startup()
@@ -280,7 +297,7 @@ namespace NecroCard
 			batch = new Batch2D(material);
 
 			Core.Window.Resizable = true;
-			Core.Window.SetTitle("Necro Card");
+			//Core.Window.SetTitle("Necro Card");
 
 			Draw.Create();
 			menu = new Menu();
