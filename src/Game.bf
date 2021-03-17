@@ -167,8 +167,9 @@ namespace NecroCard
 	// @do story mode? where there are a row of challengers to beat.
 
 	// @do default ai currently too aggressive
+	// @do the option to surrender
 
-	/**
+	/** @do
 	(boards) randome effects? - on interval
 	number of stuff that was relevant in a move should be made more prominant
 	(maybe fly towards the display it changes)
@@ -228,7 +229,7 @@ namespace NecroCard
 		public this() : base(.(320, 200))
 		{
 			Scaling = .FitFrame;
-			Core.Assert(Instance != null);
+			Runtime.Assert(Instance != null);
 		}
 
 		static this()
