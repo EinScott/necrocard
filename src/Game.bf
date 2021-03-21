@@ -169,6 +169,8 @@ namespace NecroCard
 	// @do default ai currently too aggressive
 	// @do the option to surrender
 
+	// @do put player behaviour in one player class just like enemy
+
 	/** @do
 	(boards) randome effects? - on interval
 	number of stuff that was relevant in a move should be made more prominant
@@ -241,7 +243,7 @@ namespace NecroCard
 		{
 			Texture.DefaultTextureFilter = .Nearest;
 
-			EntryPoint.Preferences = .()
+			EntryPoint.Config = .()
 				{
 					createGame = () => new NecroCard(),
 					gameTitle = "NecroCard",
@@ -261,30 +263,30 @@ namespace NecroCard
 			// LOAD SHADER PACKAGE
 			{
 				// Shaders are only created once in the beginning in this example, so the source can be release directly after
-				Core.Assets.LoadPackage("shaders");
+				Assets.LoadPackage("shaders");
 				
-				var s = scope ShaderData(Core.Assets.Get<RawAsset>("s_batch2dVert").text, Core.Assets.Get<RawAsset>("s_batch2dFrag").text);
+				var s = scope ShaderData(Assets.Get<RawAsset>("s_batch2dVert").text, Assets.Get<RawAsset>("s_batch2dFrag").text);
 
 				shader = new Shader(s);
 
-				Core.Assets.UnloadPackage("shaders");
+				Assets.UnloadPackage("shaders");
 			}
 
 			// LOAD FONTS
 			{
-				Core.Assets.LoadPackage("fonts");
+				Assets.LoadPackage("fonts");
 
-				let fnt = Core.Assets.Get<Font>("nunito_semibold");
+				let fnt = Assets.Get<Font>("nunito_semibold");
 				font = new SpriteFont(fnt, 24, Charsets.ASCII);
 
-				Core.Assets.UnloadPackage("fonts");
+				Assets.UnloadPackage("fonts");
 			}
 
 			// LOAD CONTENT PACKAGE
-			Core.Assets.LoadPackage("content");
+			Assets.LoadPackage("content");
 
 			// Music
-			theme = Core.Assets.Get<AudioClip>("theme");
+			theme = Assets.Get<AudioClip>("theme");
 			music = new GlobalSource(null, true);
 			music.Looping = true;
 			music.Play(theme);
@@ -297,7 +299,7 @@ namespace NecroCard
 			material = new Material(shader);
 			batch = new Batch2D(material);
 
-			Core.Window.Resizable = true;
+			System.Window.Resizable = true;
 			//Core.Window.SetTitle("Necro Card");
 
 			Draw.Create();
@@ -310,14 +312,14 @@ namespace NecroCard
 		{
 			Draw.Delete();
 			Sound.Delete();
-			Core.Assets.UnloadPackage("content");
+			Assets.UnloadPackage("content");
 		}
 
 		[PerfTrack]
 		protected override void Render()
 		{
 			batch.Clear();
-			Core.Graphics.Clear(Frame, .Color | .Depth | .Stencil, .Black, 0, 0, Rect(0, 0, Core.Window.RenderSize.X, Core.Window.RenderSize.Y));
+			Graphics.Clear(Frame, .Color | .Depth | .Stencil, .Black, 0, 0, Rect(0, 0, System.Window.RenderSize.X, System.Window.RenderSize.Y));
 
 			// RENDER TO FRAME
 			if (gameState == .Menu)
@@ -345,29 +347,29 @@ namespace NecroCard
 				//batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
 			}
 
-			//batch.Image(Core.Assets.[Friend]atlas[0]);
+			//batch.Image(Assets.[Friend]atlas[0]);
 
-			batch.Render(Core.Window, .DarkText);
+			batch.Render(System.Window, .DarkText);
 		}
 
 		[PerfTrack]
 		protected override void Update()
 		{
-			pixelMousePos = WindowToFrame(Core.Input.MousePosition);
+			pixelMousePos = WindowToFrame(Input.MousePosition);
 
 			if (gameState == .Menu)
 				menu.Update();
 			else board.Update();
 
-			if (Core.Input.Keyboard.Alt && Core.Input.Keyboard.Pressed(.Enter))
+			if (Input.Keyboard.Alt && Input.Keyboard.Pressed(.Enter))
 			{
-				Core.Window.Fullscreen = !Core.Window.Fullscreen;
+				System.Window.Fullscreen = !System.Window.Fullscreen;
 			}	
 
 #if DEBUG
-			if (Core.Input.Keyboard.Pressed(.F1))
+			if (Input.Keyboard.Pressed(.F1))
 				debugRender = !debugRender;
-			if (Core.Input.Keyboard.Pressed(.F3)) // Full reset
+			if (Input.Keyboard.Pressed(.F3)) // Full reset
 			{
 				LoadGame();
 			}

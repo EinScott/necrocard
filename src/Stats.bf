@@ -118,7 +118,7 @@ namespace NecroCard
 			}
 
 			// Click events
-			if (Core.Input.Mouse.Pressed(.Left))
+			if (Input.Mouse.Pressed(.Left))
 			{
 				// note: turn will be consumed by the called functions if the action is valid
 
@@ -139,7 +139,7 @@ namespace NecroCard
 			}
 
 			prevButtonDown = buttonDown;
-			buttonDown = Core.Input.Mouse.Down(.Left) && DrawButton.Contains(PixelMouse);
+			buttonDown = Input.Mouse.Down(.Left) && DrawButton.Contains(PixelMouse);
 			if (!prevButtonDown && buttonDown)
 				SoundSource.Play(Sound.buttonHover);
 		}

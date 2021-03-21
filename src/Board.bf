@@ -268,7 +268,7 @@ namespace NecroCard
 					|| endscreenMenuHover && !prevMenuHover)
 					SoundSource.Play(Sound.buttonHover);
 
-				if (Core.Input.Mouse.Pressed(.Left))
+				if (Input.Mouse.Pressed(.Left))
 				{
 					if (endscreenRestartHover)
 					{

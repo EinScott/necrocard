@@ -66,7 +66,7 @@ namespace NecroCard
 			prevFocusedButton = focusedButton;
 
 			logoSin = (float)Math.Sin(Time.Duration.TotalSeconds * 2) * 4;
-			bool click = Core.Input.Mouse.Pressed(.Left);
+			bool click = Input.Mouse.Pressed(.Left);
 
 			if (!tutorial)
 			{
@@ -79,7 +79,7 @@ namespace NecroCard
 					}
 
 					// Slider controls
-					if (Core.Input.Mouse.Down(.Left))
+					if (Input.Mouse.Down(.Left))
 					{
 						let diff = Math.Clamp(PixelMouse.X - SoundSliderBox.X, 0, SoundSliderBox.Width);
 						sliderValue = ((float)diff / SoundSliderBox.Width) * SliderScale;
@@ -197,7 +197,7 @@ namespace NecroCard
 						tutorialCardOffset = 0;
 					}
 
-					if (dragging && !Core.Input.Mouse.Down(.Left))
+					if (dragging && !Input.Mouse.Down(.Left))
 					{
 						// Drag end
 						if (Rect(tutorialEnemyCardLayoutPos, Card.Size).Overlaps(Rect(PixelMouse + tutorialDragOffset, Card.Size)))

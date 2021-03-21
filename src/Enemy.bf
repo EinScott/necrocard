@@ -23,7 +23,7 @@ namespace NecroCard
 		{
 			Stats = stats;
 			Layout = layout;
-			hard = (!first && rand.Next(0, 3) == 0 || Core.Input.Keyboard.Shift);
+			hard = (!first && rand.Next(0, 3) == 0 || Input.Keyboard.Shift);
 			Log.Debug(hard);
 		}
 

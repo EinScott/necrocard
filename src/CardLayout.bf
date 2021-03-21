@@ -193,12 +193,12 @@ namespace NecroCard
 				}
 			}
 
-			if (Core.Input.Mouse.Pressed(.Left) && selected >= 0)
+			if (Input.Mouse.Pressed(.Left) && selected >= 0)
 			{
 				dragging = true;
 				SoundSource.Play(Sound.cardClick);
 			}
-			else if (dragging && !Core.Input.Mouse.Down(.Left))
+			else if (dragging && !Input.Mouse.Down(.Left))
 			{
 				// Look for overlaps
 				let enemyCards = ref Board.enemyLayout.cards;
