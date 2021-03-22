@@ -108,14 +108,14 @@ namespace NecroCard
 			// all these actions have chances so that this thing does dumb stuff!
 
 			// if the board is even and i have less than normal health and can play the next turn, attack
-			if (hard && canAttack && (Layout.count >= 2 || Layout.count == 1 && Stats.health > 6) && Layout.count == Stats.[Friend]Board.playerLayout.count && Stats.hand.Count >= 1 && rand.XinYChance(2, 6))
+			if (hard && canAttack && (Layout.count >= 2 || Layout.count == 1 && Stats.health > 6) && Layout.count == Stats.[Friend]Board.playerLayout.count && Stats.hand.Count >= 1 && rand.XinYChance(1, 4))
 				Attack();
 
-			else if (hard && canAttack && Stats.health > Stats.[Friend]Board.playerStats.health && Stats.hand.Count > 0 && rand.XinYChance(2, 5))
+			else if (hard && canAttack && Stats.health > Stats.[Friend]Board.playerStats.health && Stats.hand.Count > 0 && rand.XinYChance(1, 3))
 				Attack();
 
 			// if i have more cards than the player, attack
-			else if (hard && canAttack && Layout.count > Stats.[Friend]Board.playerLayout.count && rand.XinYChance(2, 4))
+			else if (hard && canAttack && Layout.count > Stats.[Friend]Board.playerLayout.count && rand.XinYChance(1, 4))
 				Attack();
 
 			// if my board is empty try to play card that is equal to the card played by the player
@@ -126,12 +126,12 @@ namespace NecroCard
 			else if (Stats.hand.Count < 2 && rand.XinYChance(2, Layout.count * 2 + 1))
 				DrawCard();
 
+			else if (Stats.hand.Count > 0 && rand.XinYChance(6 - Layout.count, 6))
+				PlayACard();
+
 			// Chance of attacking cards
 			else if (canAttack && rand.XinYChance(3, 6 - Layout.count) && (!hard || (Stats.health > 2 && Layout.count == 1 || Layout.count > 1)))
 				Attack();
-
-			else if (Stats.hand.Count > 0 && rand.XinYChance(2, 3))
-				PlayACard();
 
 			else if (rand.XinYChance(1, 2))
 				DrawCard();
@@ -301,7 +301,21 @@ namespace NecroCard
 				}
 
 				if (attackingCard == -1)
-					return;
+				{
+					// If we end up here that means we're either stupid or can only trade, but were stupid/unlucky before
+					// This may or may not be slightly crappy
+					repeat
+						for (let i < Layout.cards.Count)
+							if (rand.XinYChance(1, 2) && Layout.cards[i].Card != null)
+								attackingCard = i;
+					while (attackingCard >= 0 && Layout.cards[attackingCard].Card == null);
+
+					repeat
+						for (let i < otherLayout.cards.Count)
+							if (rand.XinYChance(1, 2) && otherLayout.cards[i].Card != null)
+								attackedCard = i;
+					while (attackedCard >= 0 && otherLayout.cards[attackedCard].Card == null);
+				}
 
 				// Set Layout up for dragging the card we want
 				Layout.EnemySetSelectedDrag(attackingCard);

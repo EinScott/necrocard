@@ -239,7 +239,7 @@ namespace NecroCard
 			EntryPoint.OnStart.Add(new => OnStart);
 		}
 
-		static Result<void> OnStart() // @do use this in pile example!
+		static Result<void> OnStart()
 		{
 			Texture.DefaultTextureFilter = .Nearest;
 
