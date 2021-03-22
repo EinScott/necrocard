@@ -3,4 +3,4 @@ Projects = {NecroCard = {Path = "."}, Pile = {Path = "../Pile/Pile"}, Pile_SDL2 
 
 [Workspace]
 StartupProject = "NecroCard"
-
+PreprocessorMacros = ["PILE_CORE_PERFTRACK"]

@@ -308,13 +308,13 @@ namespace NecroCard
 						for (let i < Layout.cards.Count)
 							if (rand.XinYChance(1, 2) && Layout.cards[i].Card != null)
 								attackingCard = i;
-					while (attackingCard >= 0 && Layout.cards[attackingCard].Card == null);
+					while (attackingCard < 0 || Layout.cards[attackingCard].Card == null);
 
 					repeat
 						for (let i < otherLayout.cards.Count)
 							if (rand.XinYChance(1, 2) && otherLayout.cards[i].Card != null)
 								attackedCard = i;
-					while (attackedCard >= 0 && otherLayout.cards[attackedCard].Card == null);
+					while (attackedCard < 0 || otherLayout.cards[attackedCard].Card == null);
 				}
 
 				// Set Layout up for dragging the card we want
