@@ -305,7 +305,7 @@ namespace NecroCard
 			Draw.Create();
 			menu = new Menu();
 
-			Performance.Track = true;
+			Perf.Track = true;
 		}
 
 		protected override void Shutdown()
@@ -342,7 +342,7 @@ namespace NecroCard
 
 			if (debugRender)
 			{
-				Performance.Render(batch, font);
+				Perf.Render(batch, font);
 
 				//batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
 			}
