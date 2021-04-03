@@ -70,7 +70,7 @@ namespace NecroCard
 
 			if (!tutorial)
 			{
-				if (SoundSliderBox.Contains(PixelMouse) || sliderDragging)
+				if (SoundSliderBox.Contains(PixelMouse) && System.Window.Focus || sliderDragging)
 				{
 					if (!prevSliderFocused)
 					{
@@ -93,7 +93,7 @@ namespace NecroCard
 				}
 				else prevSliderFocused = false;
 
-				if (tutorialButton.Contains(PixelMouse))
+				if (tutorialButton.Contains(PixelMouse) && System.Window.Focus)
 				{
 					focusedButton = 1;
 					if (click)
@@ -106,7 +106,7 @@ namespace NecroCard
 						SoundSource.Play(Sound.buttonHover);
 					}
 				}
-				else if (playButton.Contains(PixelMouse))
+				else if (playButton.Contains(PixelMouse) && System.Window.Focus)
 				{
 					focusedButton = 2;
 					if (click)
@@ -119,7 +119,7 @@ namespace NecroCard
 						SoundSource.Play(Sound.buttonHover);
 					}
 				}
-				else if (quitButton.Contains(PixelMouse))
+				else if (quitButton.Contains(PixelMouse) && System.Window.Focus)
 				{
 					focusedButton = 3;
 					if (click) Core.Exit();
@@ -132,7 +132,7 @@ namespace NecroCard
 			}
 			else
 			{
-				if (tutorialBackButton.Contains(PixelMouse))
+				if (tutorialBackButton.Contains(PixelMouse) && System.Window.Focus)
 				{
 					focusedButton = 4;
 					if (click)
@@ -150,7 +150,7 @@ namespace NecroCard
 				// Interactive tutorial
 				if (tutorialStage == 0)
 				{
-					if (Rect(tutorialCardHandPos, Card.Size).Contains(PixelMouse))
+					if (Rect(tutorialCardHandPos, Card.Size).Contains(PixelMouse) && System.Window.Focus)
 					{
 						tutorialCardOffset = Math.Lerp(tutorialCardOffset, Stats.PlayOffset, Time.Delta * 10);
 
@@ -174,7 +174,7 @@ namespace NecroCard
 				}
 				else if (tutorialStage == 1)
 				{
-					if (Rect(tutorialCardLayoutPos, Card.Size).Contains(PixelMouse))
+					if (Rect(tutorialCardLayoutPos, Card.Size).Contains(PixelMouse) && System.Window.Focus)
 					{
 						tutorialCardOffset = -1;
 

@@ -261,8 +261,8 @@ namespace NecroCard
 			{
 				bool prevRestartHover = endscreenRestartHover;
 				bool prevMenuHover = endscreenMenuHover;
-				endscreenRestartHover = endscreenRestart.Contains(PixelMouse);
-				endscreenMenuHover = endscreenMenu.Contains(PixelMouse);
+				endscreenRestartHover = endscreenRestart.Contains(PixelMouse) && System.Window.Focus;
+				endscreenMenuHover = endscreenMenu.Contains(PixelMouse) && System.Window.Focus;
 
 				if (endscreenRestartHover && !prevRestartHover
 					|| endscreenMenuHover && !prevMenuHover)

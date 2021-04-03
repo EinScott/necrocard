@@ -218,6 +218,7 @@ namespace NecroCard
 		public Board board ~ DeleteNotNull!(_);
 		public Menu menu ~ delete _;
 		public Point2 pixelMousePos;
+		float actualVolume;
 
 		public enum GameState
 		{
@@ -300,6 +301,7 @@ namespace NecroCard
 			batch = new Batch2D(material);
 
 			System.Window.Resizable = true;
+			System.Window.OnFocusChanged.Add(new => FocusChanged);
 			//Core.Window.SetTitle("Necro Card");
 
 			Draw.Create();
@@ -308,8 +310,20 @@ namespace NecroCard
 			Perf.Track = true;
 		}
 
+		void FocusChanged()
+		{
+			if (!System.Window.Focus)
+			{
+				actualVolume = music.Volume;
+				music.Volume = 0;
+			}
+			else music.Volume = actualVolume;
+		}
+
 		protected override void Shutdown()
 		{
+			System.Window.OnFocusChanged.Remove(scope => FocusChanged, true);
+
 			Draw.Delete();
 			Sound.Delete();
 			Assets.UnloadPackage("content");
