@@ -206,7 +206,7 @@ namespace NecroCard
 	public class NecroCard : PixelGame<NecroCard>
 	{
 		Material material ~ delete _;
-		Shader shader ~ delete _;
+		PersistentAsset<Shader, ShaderData> shader ~ delete _;
 		public Batch2D batch ~ delete _;
 		public bool debugRender;
 
@@ -218,7 +218,7 @@ namespace NecroCard
 		public Board board ~ DeleteNotNull!(_);
 		public Menu menu ~ delete _;
 		public Point2 pixelMousePos;
-		float actualVolume;
+		float actualVolume = 1;
 
 		public enum GameState
 		{
@@ -265,12 +265,8 @@ namespace NecroCard
 			{
 				// Shaders are only created once in the beginning in this example, so the source can be release directly after
 				Assets.LoadPackage("shaders");
-				
-				var s = scope ShaderData(Assets.Get<RawAsset>("s_batch2dVert").text, Assets.Get<RawAsset>("s_batch2dFrag").text);
 
-				shader = new Shader(s);
-
-				Assets.UnloadPackage("shaders");
+				shader = new .(new Shader(Assets.Get<ShaderData>("batch2d")), "batch2d");
 			}
 
 			// LOAD FONTS
@@ -327,6 +323,9 @@ namespace NecroCard
 			Draw.Delete();
 			Sound.Delete();
 			Assets.UnloadPackage("content");
+
+			// @do put back, just here for shader reloading tests
+			Assets.UnloadPackage("shaders");
 		}
 
 		[PerfTrack]

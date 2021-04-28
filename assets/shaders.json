@@ -1,9 +1,11 @@
 {
+  "additionals": [
+    "Shaders/*.glsl"
+  ],
   "imports": [
     {
-	    "path": "Shaders/*",
-	    "importer": "raw",
-      "name_prefix": "s_"
+	    "path": "Shaders/*.json",
+	    "importer": "shader"
     }
   ]
 }
