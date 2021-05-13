@@ -49,6 +49,7 @@ namespace NecroCard
 			Register!(new Card("Elok", 6, 3, 3));
 			Register!(new Card("Bleh", 3, 2, 4));
 			Register!(new Card("Snek", 5, 4, 6)); // index 5 is "none"
+			Register!(new Card("Kek", 1, 5, 7));
 		}
 
 		const Rect endscreenRestart = .(132, 84, 56, 14);

@@ -205,8 +205,6 @@ namespace NecroCard
 	[AlwaysInclude]
 	public class NecroCard : PixelGame<NecroCard>
 	{
-		Material material ~ delete _;
-		PersistentAsset<Shader, ShaderData> shader ~ delete _;
 		public Batch2D batch ~ delete _;
 		public bool debugRender;
 
@@ -242,7 +240,10 @@ namespace NecroCard
 
 		static Result<void> OnStart()
 		{
+			// This, notably also influences the Assets atlas
+			// @do -> that should maybe change in future?
 			Texture.DefaultTextureFilter = .Nearest;
+			Texture.DefaultTextureGenMipmaps = false;
 
 			EntryPoint.Config = .()
 				{
@@ -260,14 +261,6 @@ namespace NecroCard
 		protected override void Startup()
 		{
 			base.Startup();
-
-			// LOAD SHADER PACKAGE
-			{
-				// Shaders are only created once in the beginning in this example, so the source can be release directly after
-				Assets.LoadPackage("shaders");
-
-				shader = new .(new Shader(Assets.Get<ShaderData>("batch2d")), "batch2d");
-			}
 
 			// LOAD FONTS
 			{
@@ -293,8 +286,7 @@ namespace NecroCard
 			sounds = new GlobalSource();
 
 			// SETUP RENDERING STUFF
-			material = new Material(shader);
-			batch = new Batch2D(material);
+			batch = new Batch2D();
 
 			System.Window.Resizable = true;
 			System.Window.OnFocusChanged.Add(new => FocusChanged);
@@ -323,9 +315,6 @@ namespace NecroCard
 			Draw.Delete();
 			Sound.Delete();
 			Assets.UnloadPackage("content");
-
-			// @do put back, just here for shader reloading tests
-			Assets.UnloadPackage("shaders");
 		}
 
 		[PerfTrack]
@@ -339,7 +328,7 @@ namespace NecroCard
 				menu.Render(batch);
 			else board.Render(batch);
 
-			if (DebugRender)
+			if (debugRender)
 				batch.Rect(.(pixelMousePos, .One), .White);
 
 			batch.Render(Frame);
@@ -352,6 +341,8 @@ namespace NecroCard
 				menu.RenderHiRes(batch);
 			else
 				board.RenderHiRes(batch);
+
+			//batch.TextMixed(font, "Card: {0}{{", .Zero, .White, Draw.cards.Asset.Frames[0].Texture);
 
 			if (debugRender)
 			{
