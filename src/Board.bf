@@ -43,9 +43,9 @@ namespace NecroCard
 				allCards.Add(card);
 			}
 
-			Register!(new Card("Thork", 7, 1, 0));
+			Register!(new Card("Thork", 8, 1, 0));
 			Register!(new Card("Bacat", 4, 4, 1));
-			Register!(new Card("Quak", 5, 2, 2));
+			Register!(new Card("Quak", 6, 2, 2));
 			Register!(new Card("Elok", 6, 3, 3));
 			Register!(new Card("Bleh", 3, 2, 4));
 			Register!(new Card("Snek", 5, 4, 6)); // index 5 is "none"
