@@ -4,7 +4,7 @@ Dependencies = {corlib = "*", Pile = "*", Pile_SDL2 = "*", Pile_SoLoud = "*", Fa
 [Project]
 Name = "NecroCard"
 TargetType = "BeefGUIApplication"
-StartupObject = "Pile.EntryPoint"
+StartupObject = "Pile.Core"
 Aliases = ["PileGame"]
 
 [Platform.Windows]

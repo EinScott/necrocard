@@ -235,17 +235,16 @@ namespace NecroCard
 
 		static this()
 		{
-			EntryPoint.OnStart.Add(new => OnStart);
+			Core.OnStart.Add(new => OnStart);
 		}
 
 		static Result<void> OnStart()
 		{
 			// This, notably also influences the Assets atlas
 			// @do -> that should maybe change in future?
-			Texture.DefaultTextureFilter = .Nearest;
-			Texture.DefaultTextureGenMipmaps = false;
+			Core.Defaults.SetupPixelPerfect();
 
-			EntryPoint.Config = .()
+			Core.Config = .()
 				{
 					createGame = () => new NecroCard(),
 					gameTitle = "NecroCard",
