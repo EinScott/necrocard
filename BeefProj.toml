@@ -1,5 +1,5 @@
 FileVersion = 1
-Dependencies = {corlib = "*", Pile = "*", Pile_SDL2 = "*", Pile_SoLoud = "*", FastNoiseLite = "*", Pile_OpenGL = "*", Dimtoo = "*"}
+Dependencies = {corlib = "*", Pile = "*", Pile_SDL2 = "*", Pile_SoLoud = "*", Pile_OpenGL = "*", Dimtoo = "*"}
 
 [Project]
 Name = "NecroCard"

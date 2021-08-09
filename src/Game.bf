@@ -1,7 +1,6 @@
 using Pile;
 using System;
 using System.IO;
-using FastNoiseLite;
 using System.Collections;
 using Dimtoo;
 
@@ -152,19 +151,13 @@ namespace NecroCard
 		}
 	}
 
-	// "a magician's / necromancer's card game?"
 	// @do add interactive tutorial "magic rulebook"
 	// @do add different ai enemy "personalities"
-	// @do add more cards?
 	// @do find a way to increase strategic depth
-	// @do cleanup some code!
-	// @do fool around with multiplayer at some point?
 	// @do sound when you leave the board empty
 	// @do try drawing 2 cards
 	// @do show enemy card count
 	// @do draw button sound bug?
-	// @do opening animation/sequence, some lore!
-	// @do story mode? where there are a row of challengers to beat.
 
 	// @do default ai currently too aggressive
 	// @do the option to surrender
@@ -172,25 +165,20 @@ namespace NecroCard
 	// @do put player behaviour in one player class just like enemy
 
 	/** @do
-	(boards) randome effects? - on interval
+	(boards) random effects? - on interval
 	number of stuff that was relevant in a move should be made more prominant
 	(maybe fly towards the display it changes)
 	enemy abilities (commander like)
 	card "mode"
-	cheaten?
+	option to try to cheat?
 	make start of rounds better "opening"
-	fog of war cards
 	synergies of cards
 	-> activaten takes a turn
 	-> or combine cards?
 	- maybe tradoff (get less energy back)
 
-	different decks or unique cards per person
-
 	deck building?
 	-> if commander style abilities - maybe tie deck to commander
-
-	kek 0 0
 
 	maybe limit decks in some way, (when we have more cards)
 	each game should have a limited deck, maybe even the same one
@@ -203,7 +191,7 @@ namespace NecroCard
 	*/
 
 	[AlwaysInclude]
-	public class NecroCard : PixelGame<NecroCard>
+	class NecroCard : PixelGame<NecroCard>
 	{
 		public Batch2D batch ~ delete _;
 		public bool debugRender;
@@ -346,6 +334,7 @@ namespace NecroCard
 			if (debugRender)
 			{
 				Perf.Render(batch, font);
+				DevConsole.Render(batch, font, .(.(0, (.)System.Window.RenderSize.Y / 2), .(System.Window.RenderSize.X, System.Window.RenderSize.Y / 2)));
 
 				//batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
 			}
@@ -376,6 +365,16 @@ namespace NecroCard
 			{
 				LoadGame();
 			}
+			if (Input.Keyboard.Pressed(.F4))
+			{
+				System.TakeScreenshot(); // This crashes right now... will need to fix
+			}
+
+			if (DebugRender)
+				DevConsole.Update();
+			Input.UseLocalKeyLayout = true;
+			if (Input.Keyboard.Pressed(.Y))
+				Log.Info("PRESS US Y Key"); // Test if this is now properly keyboard layout invariant
 #endif
 		}
 
@@ -400,5 +399,16 @@ namespace NecroCard
 		}
 
 		public Point2 Center => FrameSize / 2;
+	}
+}
+
+
+namespace Pile
+{
+	extension Commands
+	{
+		public static void B() {}
+		static void C() {}
+
 	}
 }

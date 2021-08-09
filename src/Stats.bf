@@ -185,7 +185,14 @@ namespace NecroCard
 
 			hand.Add(.(Board.DrawCard()));
 
-			drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
+			// CRASHES -- REPORT
+			//drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
+
+			let spacing = CardSpacing;
+			let cardSize = Card.Size.X;
+			let negOffset = hand.Count * (spacing + cardSize) / 2;
+
+			drawStartXOffset = -negOffset;
 
 			if (!force)
 			{
