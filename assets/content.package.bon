@@ -1,0 +1,12 @@
+{
+  importPasses = [
+  	{
+  	  targetDir = "sprites",
+  	  importer = "aseprite"
+  	},
+    {
+      targetDir = "audio",
+      importer = "audioClip"
+    }
+  ]
+}

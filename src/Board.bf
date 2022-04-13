@@ -74,6 +74,7 @@ namespace NecroCard
 		String resultString;
 		float gameEndDelayCounter;
 		bool gameEnds;
+		public static int wins;
 		bool playerWon;
 		bool prevPlayerTurn;
 		int turn = 0;
@@ -90,10 +91,6 @@ namespace NecroCard
 			for (int i < 4)
 			{
 				playerStats.DrawCard(true);
-			}
-
-			for (int i < 4)
-			{
 				enemyStats.DrawCard(true);
 			}
 
@@ -140,9 +137,11 @@ namespace NecroCard
 				Draw.particles.Asset.Draw(batch, part.Type.Underlying, part.position, part.scale);
 
 			enemyLayout.RenderTop(batch);
-			playerLayout.RenderTop(batch);
-
-			playerStats.Render(batch);
+			
+			enemyStats.Render(batch, -181, true);
+			playerStats.Render(batch, 0, false);
+			
+			playerLayout.RenderTop(batch); // Ours is on of of all else. This way when we drag cards, we actually overlay them on everything!
 
 			if (GameState == .GameEnd)
 			{
@@ -191,6 +190,8 @@ namespace NecroCard
 
 				playerLayout.Update();
 				enemyLayout.Update();
+				
+				enemyStats.Update();
 
 				// These are player controlled
 				playerStats.Update();
@@ -248,6 +249,7 @@ namespace NecroCard
 					{
 						gameEnds = true;
 						playerWon = true;
+						wins++;
 						resultString = "COM ran out of energy";
 					}
 

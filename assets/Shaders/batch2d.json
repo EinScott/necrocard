@@ -1,4 +1,0 @@
-{
-  "vertexPath": "batch2dVert.glsl",
-  "fragmentPath": "batch2dFrag.glsl"
-}

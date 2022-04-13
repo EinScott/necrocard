@@ -17,15 +17,17 @@ namespace NecroCard
 			set mut
 			{
 				easePos = value;
-				Position = value.Round();
+				Position = value.ToRounded();
 			}
 		}
 
-		public this(Card card)
+		public this(Card card, bool enemyCard)
 		{
 			Card = card;
 			easePos = .(0, 64); // Middle below screen
-			Position = easePos.Round();
+			if (enemyCard)
+				easePos.Y *= -1;
+			Position = easePos.ToRounded();
 		}
 	}
 
@@ -60,7 +62,6 @@ namespace NecroCard
 			IsPlayer = player;
 		}
 
-		// not called on enemy because its not visible
 		public void Update()
 		{
 			// Card position ease
@@ -144,16 +145,19 @@ namespace NecroCard
 				SoundSource.Play(Sound.buttonHover);
 		}
 
-		public void Render(Batch2D batch)
+		public void Render(Batch2D batch, int yOffset, bool cardBackside)
 		{
 			for (int i < hand.Count)
 			{
 				let handCard = hand[[Unchecked]i];
-				handCard.Card.Draw(batch, Top + handCard.Position);
+				let pos = Top + handCard.Position + .(0, yOffset);
+				if (cardBackside)
+					Draw.cards.Asset.Draw(batch, 8, pos); // Draw hidden card
+				else handCard.Card.Draw(batch, pos);
 
 				if (DebugRender)
 				{
-					batch.HollowRect(.(Top + handCard.Position, Card.Size), 1, .Red);
+					batch.HollowRect(.(pos, Card.Size), 1, .Red);
 				}
 			}
 
@@ -183,16 +187,16 @@ namespace NecroCard
 			if (!force && !CanDrawCard())
 				return;
 
-			hand.Add(.(Board.DrawCard()));
+			hand.Add(.(Board.DrawCard(), this == Board.enemyStats));
 
-			// CRASHES -- REPORT
-			//drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
+			drawStartXOffset = -(hand.Count * (CardSpacing + Card.Size.X)) / 2;
 
-			let spacing = CardSpacing;
+			/*let spacing = CardSpacing;
 			let cardSize = Card.Size.X;
 			let negOffset = hand.Count * (spacing + cardSize) / 2;
-
+			
 			drawStartXOffset = -negOffset;
+			*/
 
 			if (!force)
 			{

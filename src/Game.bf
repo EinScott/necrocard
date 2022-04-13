@@ -40,151 +40,73 @@ namespace NecroCard
 
 	static class Sound
 	{
-		// these could also be assets, but we wont reload them so...
-		public static Asset<AudioClip> buttonClick;
-		public static Asset<AudioClip> buttonHover;
-		public static Asset<AudioClip> cardAttack;
-		public static Asset<AudioClip> cardBlock;
-		public static Asset<AudioClip> cardHeal;
-		public static Asset<AudioClip> cardHover;
-		public static Asset<AudioClip> cardPlay;
-		public static Asset<AudioClip> cardShuffle;
-		public static Asset<AudioClip> cardClick;
-		public static Asset<AudioClip> win;
-
-		internal static void Create()
-		{
-			buttonClick = new Asset<AudioClip>("button_click");
-			buttonHover = new Asset<AudioClip>("button_hover");
-			cardAttack = new Asset<AudioClip>("card_attack");
-			cardBlock = new Asset<AudioClip>("card_block");
-			cardHeal = new Asset<AudioClip>("card_heal");
-			cardHover = new Asset<AudioClip>("card_hover");
-			cardPlay = new Asset<AudioClip>("card_play");
-			cardShuffle = new Asset<AudioClip>("card_shuffle");
-			cardClick = new Asset<AudioClip>("card_click");
-			win = new Asset<AudioClip>("win");
-		}
-
-		internal static void Delete()
-		{
-			delete buttonClick;
-			delete buttonHover;
-			delete cardAttack;
-			delete cardBlock;
-			delete cardHeal;
-			delete cardHover;
-			delete cardPlay;
-			delete cardShuffle;
-			delete cardClick;
-			delete win;
-		}
+		public static Asset<AudioClip> buttonClick = .("audio/button_click");
+		public static Asset<AudioClip> buttonHover = .("audio/button_hover");
+		public static Asset<AudioClip> cardAttack = .("audio/card_attack");
+		public static Asset<AudioClip> cardBlock = .("audio/card_block");
+		public static Asset<AudioClip> cardHeal = .("audio/card_heal");
+		public static Asset<AudioClip> cardHover = .("audio/card_hover");
+		public static Asset<AudioClip> cardPlay = .("audio/card_play");
+		public static Asset<AudioClip> cardShuffle = .("audio/card_shuffle");
+		public static Asset<AudioClip> cardClick = .("audio/card_click");
+		public static Asset<AudioClip> win = .("audio/win");
 	}
 
 	static class Draw
 	{
-		public static Asset<Sprite> cards;
-		public static Asset<Sprite> background;
-		public static Asset<Sprite> drawButton;
-		public static Asset<Sprite> turn;
-		public static Asset<Sprite> smallNumbers;
-		public static Asset<Sprite> bigNumbers;
-		public static Asset<Sprite> restartButton;
-		public static Asset<Sprite> menuButton;
-		public static Asset<Sprite> endscreen;
-		public static Asset<Sprite> hardAIIndicator;
-		public static Asset<Sprite> particles;
-		public static Asset<Sprite> warning;
-		public static Asset<Sprite> menu;
-		public static Asset<Sprite> tutorialButton;
-		public static Asset<Sprite> playButton;
-		public static Asset<Sprite> quitButton;
-		public static Asset<Sprite> logo;
-		public static Asset<Sprite> backButton;
+		public static Asset<Sprite> cards = .("sprites/cards");
+		public static Asset<Sprite> background = .("sprites/background");
+		public static Asset<Sprite> drawButton = .("sprites/button_draw");
+		public static Asset<Sprite> turn = .("sprites/turn");
+		public static Asset<Sprite> smallNumbers = .("sprites/small_numbers");
+		public static Asset<Sprite> bigNumbers = .("sprites/big_numbers");
+		public static Asset<Sprite> restartButton = .("sprites/button_restart");
+		public static Asset<Sprite> menuButton = .("sprites/button_menu");
+		public static Asset<Sprite> endscreen = .("sprites/endscreen");
+		public static Asset<Sprite> hardAIIndicator = .("sprites/hard");
+		public static Asset<Sprite> particles = .("sprites/particles");
+		public static Asset<Sprite> warning = .("sprites/warning");
+		public static Asset<Sprite> menu = .("sprites/menu");
+		public static Asset<Sprite> tutorialButton = .("sprites/button_tutorial");
+		public static Asset<Sprite> playButton = .("sprites/button_play");
+		public static Asset<Sprite> quitButton = .("sprites/button_quit");
+		public static Asset<Sprite> logo = .("sprites/logo");
+		public static Asset<Sprite> backButton = .("sprites/button_back");
 		public static SpriteFont font;
 
 		internal static void Create()
 		{
-			cards = new Asset<Sprite>("cards");
-			background = new Asset<Sprite>("background");
-			drawButton = new Asset<Sprite>("button_draw");
-			turn = new Asset<Sprite>("turn");
-			smallNumbers = new Asset<Sprite>("small_numbers");
-			bigNumbers = new Asset<Sprite>("big_numbers");
-			menuButton = new Asset<Sprite>("button_menu");
-			restartButton = new Asset<Sprite>("button_restart");
-			endscreen = new Asset<Sprite>("endscreen");
-			hardAIIndicator = new Asset<Sprite>("hard");
-			particles = new Asset<Sprite>("particles");
-			warning = new Asset<Sprite>("warning");
-			menu = new Asset<Sprite>("menu");
-			tutorialButton = new Asset<Sprite>("button_tutorial");
-			playButton = new Asset<Sprite>("button_play");
-			quitButton = new Asset<Sprite>("button_quit");
-			logo = new Asset<Sprite>("logo");
-			backButton = new Asset<Sprite>("button_back");
-
-			// just reference
 			font = NecroCard.Instance.font;
-		}
-
-		internal static void Delete()
-		{
-			delete cards;
-			delete background;
-			delete drawButton;
-			delete turn;
-			delete smallNumbers;
-			delete bigNumbers;
-			delete menuButton;
-			delete restartButton;
-			delete endscreen;
-			delete hardAIIndicator;
-			delete particles;
-			delete warning;
-			delete menu;
-			delete tutorialButton;
-			delete playButton;
-			delete quitButton;
-			delete logo;
-			delete backButton;
 		}
 	}
 
-	// @do add interactive tutorial "magic rulebook"
-	// @do add different ai enemy "personalities"
-	// @do find a way to increase strategic depth
-	// @do sound when you leave the board empty
-	// @do try drawing 2 cards
-	// @do show enemy card count
-	// @do draw button sound bug?
+	// add interactive tutorial "magic rulebook"
+	// add different ai enemy "personalities"
+	// find a way to increase strategic depth
+	// sound when you leave the board empty
+	// try drawing 2 cards
+	// draw button sound bug?
 
-	// @do default ai currently too aggressive
-	// @do the option to surrender
+	// default ai currently too aggressive
+	// the option to surrender
 
-	// @do put player behaviour in one player class just like enemy
+	// put player behaviour in one player class just like enemy
 
-	/** @do
+	/** maybe do...
 	(boards) random effects? - on interval
-	number of stuff that was relevant in a move should be made more prominant
-	(maybe fly towards the display it changes)
 	enemy abilities (commander like)
-	card "mode"
-	option to try to cheat?
+	card "mode"?
+	option to try to cheat??
 	make start of rounds better "opening"
 	synergies of cards
 	-> activaten takes a turn
 	-> or combine cards?
 	- maybe tradoff (get less energy back)
 
-	deck building?
+	"decks"?
 	-> if commander style abilities - maybe tie deck to commander
 
-	maybe limit decks in some way, (when we have more cards)
-	each game should have a limited deck, maybe even the same one
-	they could be random, or rely on the commander or something
-
-	Problem: no insentive for more than two cards on the board, also the ai mostly starts trading if you dont
+	Problem: no incentive for more than two cards on the board, also the ai mostly starts trading if you dont
 	-> can be solved by some of the stuff here, probably
 
 	have button class? they should probably only focus and play sounds when the window is actually focused!
@@ -228,8 +150,6 @@ namespace NecroCard
 
 		static Result<void> OnStart()
 		{
-			// This, notably also influences the Assets atlas
-			// @do -> that should maybe change in future?
 			Core.Defaults.SetupPixelPerfect();
 
 			Core.Config = .()
@@ -251,25 +171,25 @@ namespace NecroCard
 
 			// LOAD FONTS
 			{
-				Assets.LoadPackage("fonts");
+				// Provided by Dimtoo!
+				Assets.LoadPackage("font");
 
 				let fnt = Assets.Get<Font>("nunito_semibold");
 				font = new SpriteFont(fnt, 24, Charsets.ASCII);
 
-				Assets.UnloadPackage("fonts");
+				Assets.UnloadPackage("font");
 			}
 
 			// LOAD CONTENT PACKAGE
 			Assets.LoadPackage("content");
 
 			// Music
-			theme = Assets.Get<AudioClip>("theme");
+			theme = Assets.Get<AudioClip>("audio/theme");
 			music = new GlobalSource(null, true);
 			music.Looping = true;
 			music.Play(theme);
 
 			// Sounds
-			Sound.Create();
 			sounds = new GlobalSource();
 
 			// SETUP RENDERING STUFF
@@ -277,7 +197,6 @@ namespace NecroCard
 
 			System.Window.Resizable = true;
 			System.Window.OnFocusChanged.Add(new => FocusChanged);
-			//Core.Window.SetTitle("Necro Card");
 
 			Draw.Create();
 			menu = new Menu();
@@ -299,8 +218,6 @@ namespace NecroCard
 		{
 			System.Window.OnFocusChanged.Remove(scope => FocusChanged, true);
 
-			Draw.Delete();
-			Sound.Delete();
 			Assets.UnloadPackage("content");
 		}
 
@@ -333,13 +250,14 @@ namespace NecroCard
 
 			if (debugRender)
 			{
-				Perf.Render(batch, font);
+				batch.Image(Assets.[Friend]atlas[0]);
 				DevConsole.Render(batch, font, .(.(0, (.)System.Window.RenderSize.Y / 2), .(System.Window.RenderSize.X, System.Window.RenderSize.Y / 2)));
 
-				//batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
+				Perf.Render(batch, font);
+
+				batch.Rect(.(FrameToWindow(pixelMousePos), .One * 4), .Red);
 			}
 
-			//batch.Image(Assets.[Friend]atlas[0]);
 
 			batch.Render(System.Window, .DarkText);
 		}
@@ -360,7 +278,10 @@ namespace NecroCard
 
 #if DEBUG
 			if (Input.Keyboard.Pressed(.F1))
+			{
+				DevConsole.ForceFocus();
 				debugRender = !debugRender;
+			}	
 			if (Input.Keyboard.Pressed(.F3)) // Full reset
 			{
 				LoadGame();
@@ -372,9 +293,6 @@ namespace NecroCard
 
 			if (DebugRender)
 				DevConsole.Update();
-			Input.UseLocalKeyLayout = true;
-			if (Input.Keyboard.Pressed(.Y))
-				Log.Info("PRESS US Y Key"); // Test if this is now properly keyboard layout invariant
 #endif
 		}
 
@@ -399,16 +317,5 @@ namespace NecroCard
 		}
 
 		public Point2 Center => FrameSize / 2;
-	}
-}
-
-
-namespace Pile
-{
-	extension Commands
-	{
-		public static void B() {}
-		static void C() {}
-
 	}
 }

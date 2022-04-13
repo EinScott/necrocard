@@ -13,25 +13,25 @@ namespace NecroCard
 		const Point2 logoPos = .(127, 19);
 		const Point2 tutorialBoxPos = .(122, 79);
 		const String tutorialText = """
-			- whoever reaches 0 energy first, loses
+			- You play against COM(puter).
+			  Whoever reaches 0 ENERGY first, loses
 
-			- if you have no cards on the field at the
-			  end of your turn, you lose 2 energy
+			- if you have no CARDS on the FIELD at the
+			  end of your turn, you lose 2 ENERGY
 
-			- click to play cards from your hand
-			  onto the field (consumes your turn)
+			- click to play CARDS from your HAND
+			  onto the FIELD (consumes your turn)
 
-			- drag cards onto enemy cards to
-			  let them fight (consumes your turn)
+			- drag CARDS onto enemy CARDS to
+			  let them FIGHT (consumes your turn)
 
-			- in a fight, both cards are destroyed
+			- in a FIGHT, both CARDS are destroyed
 
-			- two cards with equal attack can't fight
+			- two CARDS with equal ATTACK can't FIGHT
 
-			- in a fight, if your card's attack is
-			  greater, the enemy takes that amount of
-			  damage
-			  if it is smaller, you gain the energy
+			- in a FIGHT, if your CARD's ATTACK is
+			  greater, the enemy takes that damage.
+			  If it is smaller, you gain the ENERGY
 			  of your card
 			""";
 		const Point2 tutorialCardHandPos = .(244, 141);

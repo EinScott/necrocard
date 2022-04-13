@@ -255,7 +255,7 @@ namespace NecroCard
 			for (int i < MaxCardCapacity)
 				if (cards[[Unchecked]i].Card == null)
 				{
-					cards[[Unchecked]i] = .(card);
+					cards[[Unchecked]i] = .(card, false);
 					break;
 				}
 
@@ -305,7 +305,7 @@ namespace NecroCard
 
 		public void DestroyCard(int index)
 		{
-			cards[index] = .(null);
+			cards[index] = .(null, false);
 			count--;
 		}
 

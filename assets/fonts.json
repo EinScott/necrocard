@@ -1,8 +1,0 @@
-{
-  "imports": [
-  	{
-  	  "path": "Fonts/*",
-  	  "importer": "font"
-  	}
-  ]
-}

@@ -23,7 +23,7 @@ namespace NecroCard
 		{
 			Stats = stats;
 			Layout = layout;
-			hard = (!first && rand.Next(0, 3) == 0 || Input.Keyboard.Shift);
+			hard = (!first && Board.wins > 2 && rand.Next(0, 2) == 0 || Input.Keyboard.Shift);
 			Log.Debug(hard);
 		}
 
@@ -44,7 +44,7 @@ namespace NecroCard
 				{
 					// Attack animation card lerp
 					attackCurr = Vector2.Lerp(attackCurr, attackDest, Time.Delta * 8);
-					Layout.dragPosition = attackCurr.Round();
+					Layout.dragPosition = attackCurr.ToRounded();
 				}
 				else
 					attackWaitCounter += Time.Delta;
@@ -123,7 +123,7 @@ namespace NecroCard
 				PlayACard();
 
 			// Chance of drawing cards
-			else if (Stats.hand.Count < 2 && rand.XinYChance(2, Layout.count * 2 + 1))
+			else if (Stats.hand.Count < 2 && rand.XinYChance(2, Layout.count * 2 + 2))
 				DrawCard();
 
 			else if (Stats.hand.Count > 0 && rand.XinYChance(6 - Layout.count, 6))
@@ -226,7 +226,7 @@ namespace NecroCard
 				if (otherLayout.count == 0)
 					return;
 				
-				if (Stats.health < otherStats.health || rand.XinYChance(1, 4))
+				if (Stats.health < otherStats.health || rand.XinYChance(1, 6))
 				{
 					// We should get some health
 					// attackingCard Has the highest energy and we can sacrifice it
@@ -263,7 +263,7 @@ namespace NecroCard
 					}
 				}
 
-				if (attackingCard == -1 && (Layout.count > Layout.cards.Count || rand.XinYChance(2, 3)))
+				if (attackingCard == -1 && (Layout.count >= Layout.cards.Count || rand.XinYChance(6, 7)))
 				{
 					// We should attack
 					// attackingCard Has the highest active and we can attack something with it
