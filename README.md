@@ -5,6 +5,10 @@ but it does server as a nice example for a simple game made using [Pile](https:/
 
 I'll *sort of* try to keep this compatible with the current version of Pile but I won't make any promises... checked with Pile 3.0 @ 7cfd386
 
+**Dependencies**
+- [Pile](https://github.com/EinScott/Pile) (contains Dimtoo as an example)
+- [Bon](https://github.com/EinScott/bon)
+
 ## Game description
 
 **Rules**
